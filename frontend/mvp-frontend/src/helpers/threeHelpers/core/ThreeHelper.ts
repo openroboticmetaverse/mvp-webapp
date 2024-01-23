@@ -25,7 +25,7 @@ export class ThreeHelper implements IThreeHelper {
     this.grid = new ThreeGrid()
     this.lights = new ThreeLights()
 
-
+    
     this.scene.add(this.grid.getGridMesh())
     this.lights.forEach((light) => this.scene.add(light))
     this.setupWindowResize(this.camera, this.renderer)
