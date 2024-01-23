@@ -1,0 +1,12 @@
+version: "3.4"
+services:
+  my_frontend:
+    container_name: mvp_frontend
+    image: node:lts
+    working_dir: /var/www/html/app/
+    entrypoint: /bin/bash
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./frontend/:/var/www/html/app
+    tty: true
