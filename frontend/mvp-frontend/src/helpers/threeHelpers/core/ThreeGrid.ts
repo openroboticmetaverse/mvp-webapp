@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { SimpleGrid } from '@/helpers/threeHelpers/utils/InfiniteGridHelper'
+import { SimpleGrid } from '../utils/InfiniteGridHelper'
 
 export class ThreeGrid extends SimpleGrid {
   constructor() {

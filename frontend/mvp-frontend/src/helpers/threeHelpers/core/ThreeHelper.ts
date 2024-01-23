@@ -16,11 +16,11 @@ export class ThreeHelper implements IThreeHelper {
   private scale: number
   private lights: ThreeLights
   
-  constructor(private canvas?: HTMLCanvasElement) {
+  constructor(private container?: HTMLCanvasElement) {
     this.scale = 0.01
     this.scene = new ThreeScene()
     this.camera = new ThreeCamera(window.innerWidth / window.innerHeight)
-    this.renderer = new ThreeRenderer(this.canvas)
+    this.renderer = new ThreeRenderer(this.container)
     this.controls = new ThreeControls(this.camera, this.renderer.domElement)
     this.grid = new ThreeGrid()
     this.lights = new ThreeLights()
