@@ -12,6 +12,24 @@ import { EnhancedThreeHelper } from "../helpers/threeHelpers/core/EnhancedThreeH
 import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
 const canvas = ref<HTMLCanvasElement | null>(null);
 
+const initWebSocket = (robot) => {
+  const socket = new WebSocket("ws://localhost:3000")
+    socket.onmessage = (event) => {
+      let data = JSON.parse(event.data);
+      if (data.jointPositions) {
+        console.log(robot.joints)
+        console.log(data.jointPositions)
+
+        for (let jointName in data.jointPositions) {
+        // Check if the joint exists in robot.joints
+        if (robot.joints.hasOwnProperty(jointName)) {
+          robot.setJointValue(jointName, data.jointPositions[jointName]) ;
+        }
+      }
+      }
+    }
+}
+
 onMounted(async () => {
   if (canvas.value) {
     const baseThreeHelper = new ThreeHelper(canvas.value);
@@ -26,6 +44,7 @@ onMounted(async () => {
       robot.scale.set(10, 10, 10);
       robot.rotation.x = -Math.PI / 2;
       baseThreeHelper.add(robot);
+      initWebSocket(robot)
     }
   }
 });
