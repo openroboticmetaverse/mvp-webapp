@@ -15,7 +15,7 @@ Yet another Vue 3 app ... 👾
 1. Clone the Repo 📥
 
 ```bash
-git clone https://github.com/openroboticmetaverse/mvp_frontend.git
+git clone https://github.com/openroboticmetaverse/mvp-webapp.git
 
 ```
 
