@@ -1,0 +1,25 @@
+{
+  "name": "mvp-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Orom MVP Web App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
+  },
+  "author": "Hazar Karadag",
+  "contributors": [
+    "Hazar Karadag",
+    "Karim Siala"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.3"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "ws": "^8.16.0"
+  }
+}
+
