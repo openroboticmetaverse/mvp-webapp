@@ -1,27 +1,51 @@
-Yet another Vue app...
 
-## Setup
+<p align="center">
+  <a href="https://www.openroboticmetaverse.org">
+    <img alt="orom" src="https://raw.githubusercontent.com/openroboverse/knowledge-base/main/docs/assets/icon.png" width="100" />
+  </a>
+</p>
+<h1 align="center">
+  🤖 Open Robotic Metaverse MVP - Robotics Platform 🌐
+</h1>
 
-1. Clone the Repo 
+Yet another Vue 3 app ... 👾
+
+## Setup ⚙️
+
+1. Clone the Repo 📥
 
 ```bash
 git clone https://github.com/openroboticmetaverse/mvp_frontend.git
 
 ```
 
-2. Docker Compose
+2. Docker Compose 🐳
 
 ```bash
-docker exec -it mvp_frontend /bin/bash
+docker compose up -d
 ```
-```bash
-docker exec -it mvp_frontend /bin/bash
-```
-3. In the container console
 
+## Start the backend server 💻
+
+Open a console in the container 🖥️
 ```bash
-cd mvp_frontend
+docker exec -it mvp_backend /bin/bash
 ```
+
+In the container console:
+```bash
+npm i
+```
+```bash
+npm run start
+```
+## Start the frontend 🖼️
+
+Open a console in the container 🖥️
+```bash
+docker exec -it mvp_backend /bin/bash
+```
+In the container console:
 ```bash
 npm i
 ```
@@ -29,4 +53,5 @@ npm i
 npm run dev
 ```
 
-Enjoy!
+
+Enjoy 🎉🥳
