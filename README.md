@@ -43,7 +43,7 @@ npm run start
 
 Open a console in the container 🖥️
 ```bash
-docker exec -it mvp_backend /bin/bash
+docker exec -it mvp_frontend /bin/bash
 ```
 In the container console:
 ```bash
