@@ -39,6 +39,9 @@ This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision
 git clone https://github.com/openroboticmetaverse/mvp-webapp.git
 
 ```
+```bash
+cd mvp-webapp
+```
 
 2. Docker Compose 🐳
 
