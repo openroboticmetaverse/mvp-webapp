@@ -8,7 +8,28 @@
   🤖 Open Robotic Metaverse MVP - Robotics Platform 🌐
 </h1>
 
+
 Yet another Vue 3 app ... 👾
+
+## Overview 🔍
+
+This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
+
+![Demonstrator](demonstrator.png)
+
+## Key Features 🗝️
+
+- **Interactive Robotic Control**: Users can directly interact with robots in a virtual space. 🕹️
+- **Real-Time Observation**: Enables witnessing interactions between other users and robots. 👀
+- **Cross-User Engagement**: Supports multiple users interacting simultaneously within the metaverse. 👥
+
+## Technology Stack 🛠️
+
+- **Frontend**: Developed using Vue 3 and Vite, offering a responsive and efficient user interface. 🌟
+- **Backend**: Powered by Node.js, ensuring robust server-side operations and data management. 💪
+
+
+
 
 ## Setup ⚙️
 
@@ -26,6 +47,8 @@ docker compose up -d
 ```
 
 ## Start the backend server 💻
+
+(In a new terminal)
 
 Open a console in the container 🖥️
 ```bash
