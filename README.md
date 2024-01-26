@@ -48,8 +48,6 @@ docker compose up -d
 
 ## Start the backend server 💻
 
-(In a new terminal)
-
 Open a console in the container 🖥️
 ```bash
 docker exec -it mvp_backend /bin/bash
@@ -63,6 +61,8 @@ npm i
 npm run start
 ```
 ## Start the frontend 🖼️
+
+(In a new terminal)
 
 Open a console in the container 🖥️
 ```bash
