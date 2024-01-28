@@ -59,4 +59,8 @@ export class ThreeHelper implements IThreeHelper {
     }
     animateLoop()
   }
+  public dispose() {
+    
+    this.renderer.dispose()
+  }
 }
