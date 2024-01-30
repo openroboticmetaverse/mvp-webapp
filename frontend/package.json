@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "pinia": "^2.1.7",
     "three": "^0.160.1",
     "typescript": "^5.3.3",
     "urdf-loader": "^0.12.1",
