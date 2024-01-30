@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav
-      class="fixed bottom-5 left-0 right-0 mx-auto w-4/5 h-20 bg-white bg-opacity-10 backdrop-blur-sm shadow-md flex justify-between items-center text-white z-10 rounded-lg px-4 md:px-10"
+      class="fixed bottom-5 left-0 right-0 mx-auto w-11/12 h-20 bg-white bg-opacity-10 backdrop-blur-sm shadow-md flex justify-between items-center text-white z-10 rounded-lg px-4 md:px-10"
     >
       <span class="text-xs sm:text-sm md:text-xl font-semibold tracking-[0.4em] hover:tracking-[0.5em] transition-all duration-300">
         ROBOVERSE</span
