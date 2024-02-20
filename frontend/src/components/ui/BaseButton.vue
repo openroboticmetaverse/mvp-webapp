@@ -6,7 +6,6 @@
         !disabled,
     }"
     :disabled="disabled"
-    @click="onClick"
   >
 
       <slot class="w-6 h-6 "></slot>
@@ -15,15 +14,5 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  disabled: Boolean,
-});
 
-const emit = defineEmits(["click"]);
-
-const onClick = (event: Event) => {
-  if (!props.disabled) {
-    emit("click", event);
-  }
-};
 </script>
