@@ -24,4 +24,4 @@ function publishRobotPoses() {
 }
 
 // Call the function to publish robot poses periodically
-setInterval(publishRobotPoses, 1000);
+ setInterval(publishRobotPoses, 50);
