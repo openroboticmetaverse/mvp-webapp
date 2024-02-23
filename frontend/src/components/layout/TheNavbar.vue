@@ -8,7 +8,7 @@
       >
 
       <div class="flex space-x-2 md:space-x-8 lg:space-x-12">
-        <BaseButton>
+        <BaseButton @click="toggleRobotBrowser(); deactivatePoseDislay()">
           <img
             class="w-8 h-6 md:w-10 sm:h-8 md:h-10"
             src="/src/assets/icons/load.svg"
@@ -29,7 +29,7 @@
             alt="Control Panel"
           />
         </BaseButton>
-        <BaseButton @click="togglePoseDislay">
+        <BaseButton @click="togglePoseDislay(); deactivateRobotBrowser()">
           <img
             class="w-8 h-8 md:w-10 md:h-10"
             src="/src/assets/icons/meter.svg"
@@ -47,11 +47,23 @@ import { useNavbarStore } from '../../stores/store';
 
 const navbarStore = useNavbarStore();
 
+// function deactivateControlPanel() {
+//   navbarStore.deactivateControlPanel();
+// }
 function toggleControlPanel() {
   navbarStore.toggleControlPanel();
 }
+function deactivatePoseDislay() {
+  navbarStore.deactivatePoseDisplay();
+}
 function togglePoseDislay() {
   navbarStore.togglePoseDisplay();
+}
+function deactivateRobotBrowser() {
+  navbarStore.deactivateRobotBrowser();
+}
+function toggleRobotBrowser() {
+  navbarStore.toggleRobotBrowser();
 }
 
 </script>
