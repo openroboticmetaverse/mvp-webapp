@@ -15,3 +15,16 @@ export const useNavbarStore = defineStore('navbar', {
     },
   },
 });
+export const useRobotController = defineStore('controller', {
+  state: () => ({
+    isRobotActivated: false,
+  }),
+  actions: {
+    activateRobot() {
+      this.isRobotActivated = true
+    },
+    deactivateRobot() {
+      this.isRobotActivated = false
+    }
+  },
+});

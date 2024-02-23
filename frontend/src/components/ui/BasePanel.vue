@@ -1,10 +1,10 @@
 <template>
     <div>
         <div
-            :class="`fixed bottom-36 top-12 ${computedPosition} h-4/5 w-3/12 bg-white bg-opacity-10 backdrop-blur-sm shadow-md flex justify-between items-center text-white z-10 rounded-lg  `">
-
-            <div class="flex space-x-2 md:space-x-8 lg:space-x-12">
-
+            :class="`fixed bottom-36 top-12 ${computedPosition} h-4/5 w-3/12 bg-white bg-opacity-10 backdrop-blur-sm shadow-md flex justify-between items-left text-white z-10 rounded-lg  `">
+            
+            <div class="flex space-x-2 md:space-x-8 lg:space-x-12 flex-wrap">
+                <slot name="panel"></slot>
             </div>
         </div>
     </div>
