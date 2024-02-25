@@ -6,6 +6,7 @@ const initWebSocket = (port: number): WebSocket => {
 
 export const subscribeToTransformations = (robot: Object3D, port: number): WebSocket => {
   const ws = initWebSocket(port);
+  ws.send("Hello Server!")
   ws.onmessage = (event) => {
     let data = JSON.parse(event.data);
     if (data.jointPositions) {

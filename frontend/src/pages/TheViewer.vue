@@ -35,7 +35,7 @@ onMounted(async () => {
     if (newVal && robot) {
       // Subscribe if not already subscribed
       if (newVal) {
-        ws.value = subscribeToTransformations(robot, 3000);
+        ws.value = subscribeToTransformations(robot, 8081);
       }
     } else {
 

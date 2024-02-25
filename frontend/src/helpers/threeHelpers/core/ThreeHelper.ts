@@ -44,9 +44,7 @@ export class ThreeHelper implements IThreeHelper {
   public add(mesh): void {
     this.scene.add(mesh)
   } 
-  public getObjectByName(object) {
-    return this.scene.getObjectByName(object.name)
-  } 
+
   public remove(mesh): void {
     this.scene.remove(mesh)
   } 
