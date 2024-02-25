@@ -7,52 +7,56 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 import { ThreeHelper } from "../helpers/threeHelpers/core/ThreeHelper";
 import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
 import { subscribeToTransformations, unsubscribeFromTransformations } from "../helpers/wsManager/core/wsManager"; // Assume unsubscribeFromTransformations is a method you have for unsubscribing
-import { useRobotController } from "../stores/store";
+import { useRobotController, useRobotSelector } from "../stores/store";
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 let threeHelper: ThreeHelper;
 let robot = null;
 const robotController = useRobotController();
+const robotSelector = useRobotSelector();
 const ws = ref<WebSocket | null>(null)
+
+async function createRobot(robotPath) {
+  robot = await RobotLoader.createRobot(robotPath)
+  robot.scale.set(10, 10, 10);
+  robot.rotation.x = -Math.PI / 2;
+  return robot
+}
 
 onMounted(async () => {
   if (canvas.value) {
     threeHelper = new ThreeHelper(canvas.value);
     threeHelper.animate();
 
-    robot = await RobotLoader.createRobot(
-      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/robots/panda_arm_hand.urdf.xacro"
-      // "https://raw.githubusercontent.com/openroboticmetaverse/mvp-webapp/main/frontend/public/franka_description/robots/dual_panda_example.urdf.xacro"
-
-    );
-
-    if (robot) {
-      robot.scale.set(10, 10, 10);
-      robot.rotation.x = -Math.PI / 2;
-      threeHelper.add(robot);
-
-      // Initial subscription based on isRobotActivated
-      if (robotController.isRobotActivated) {
-        ws.value = subscribeToTransformations(robot, 3000);
-      }
-    }
   }
 
   // Watcher for isRobotActivated changes
   watch(() => robotController.isRobotActivated, (newVal) => {
     if (newVal && robot) {
       // Subscribe if not already subscribed
-      if (!ws.value) {
+      if (newVal) {
         ws.value = subscribeToTransformations(robot, 3000);
       }
     } else {
-      
-      if (ws.value) {
-        unsubscribeFromTransformations(ws.value); 
+
+      if (!newVal) {
+        unsubscribeFromTransformations(ws.value);
         ws.value = null;
       }
     }
   });
+
+  watch(() => robotSelector.selectedRobot, async (newVal) => {
+    if (newVal && robot) {
+      await threeHelper.remove(robot)
+      robot = await createRobot(newVal)
+      threeHelper.add(robot)
+    }
+    else if (newVal && !robot) {
+      robot = await createRobot(newVal)
+      threeHelper.add(robot)
+    }
+  })
 });
 
 onUnmounted(() => {
