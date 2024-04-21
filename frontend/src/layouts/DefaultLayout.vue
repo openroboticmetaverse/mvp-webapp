@@ -18,7 +18,6 @@ import ControlPanel from "../components/layout/ControlPanel.vue";
 import PoseDisplay from "../components/layout/PoseDisplay.vue";
 import RobotBrowser from "../components/layout/RobotBrowser.vue";
 import DebugWindow from "../components/layout/DebugWindow.vue";
-
 const navbarStore = useNavbarStore();
 </script>
 <style scoped></style>
