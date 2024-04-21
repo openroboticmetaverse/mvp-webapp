@@ -6,6 +6,7 @@ export const useNavbarStore = defineStore("navbar", {
     isControlPanelActive: false,
     isPoseDisplayActive: false,
     isRobotBrowserActive: false,
+    isDebugActive: false
   }),
   actions: {
     deactivateControlPanel() {
@@ -25,6 +26,9 @@ export const useNavbarStore = defineStore("navbar", {
     },
     toggleRobotBrowser() {
       this.isRobotBrowserActive = !this.isRobotBrowserActive;
+    },
+    toggleDebug() {
+      this.isDebugActive = !this.isDebugActive;
     },
   },
 });
