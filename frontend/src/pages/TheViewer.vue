@@ -6,7 +6,7 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import { ThreeHelper } from "../helpers/threeHelpers/core/ThreeHelper";
 import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
-import { subscribeToTransformations, unsubscribeFromTransformations } from "../helpers/wsManager/core/wsManager"; // Assume unsubscribeFromTransformations is a method you have for unsubscribing
+import ROSLIB from 'roslib';
 import { useRobotController, useRobotSelector } from "../stores/store";
 
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -14,57 +14,84 @@ let threeHelper: ThreeHelper;
 let robot = null;
 const robotController = useRobotController();
 const robotSelector = useRobotSelector();
-const ws = ref<WebSocket | null>(null)
+
+// Setup ROS connection
+const ros = new ROSLIB.Ros({
+  url: 'ws://localhost:9090'
+});
+
+ros.on('connection', () => {
+  console.log('Connected to ROS WebSocket.');
+});
+
+ros.on('error', (error) => {
+  console.error('Error connecting to ROS: ', error);
+});
+
+ros.on('close', () => {
+  console.log('Connection to ROS closed.');
+});
+
+const jointStateTopic = new ROSLIB.Topic({
+  ros,
+  name: '/joint_states',
+  messageType: 'sensor_msgs/JointState'
+});
 
 async function createRobot(robotPath) {
-  robot = await RobotLoader.createRobot(robotPath)
+  robot = await RobotLoader.createRobot(robotPath);
   robot.scale.set(10, 10, 10);
   robot.rotation.x = -Math.PI / 2;
-  return robot
+  threeHelper.add(robot);
+
+  // Subscribe to joint state updates
+  jointStateTopic.subscribe((message) => {
+    if (robot) {
+      applyJointStatesToRobot(robot, message);
+    }
+  });
+  return robot;
+}
+
+function applyJointStatesToRobot(robot, jointStates) {
+  // Assume function applies joint states to robot joints
+  jointStates.name.forEach((jointName, index) => {
+    const joint = robot.getObjectByName(jointName);
+    if (joint) {
+      joint.rotation.x = jointStates.position[index];  // Adjust transformation based on actual joint data
+    }
+  });
 }
 
 onMounted(async () => {
   if (canvas.value) {
     threeHelper = new ThreeHelper(canvas.value);
     threeHelper.animate();
-
   }
+});
 
-  // Watcher for isRobotActivated changes
-  watch(() => robotController.isRobotActivated, (newVal) => {
-    if (newVal && robot) {
-      // Subscribe if not already subscribed
-      if (newVal) {
-        ws.value = subscribeToTransformations(robot, 8081);
-      }
+watch(() => robotController.isRobotActivated, async (newVal) => {
+  if (newVal) {
+    if (!robot && robotSelector.selectedRobot) {
+      robot = await createRobot(robotSelector.selectedRobot);
+    }
+  }
+});
+
+watch(() => robotSelector.selectedRobot, async (newVal) => {
+  if (newVal) {
+    if (robot) {
+      await threeHelper.remove(robot);
+      robot = await createRobot(newVal);
     } else {
-
-      if (!newVal) {
-        unsubscribeFromTransformations(ws.value);
-        ws.value = null;
-      }
+      robot = await createRobot(newVal);
     }
-  });
-
-  watch(() => robotSelector.selectedRobot, async (newVal) => {
-    if (newVal && robot) {
-      await threeHelper.remove(robot)
-      robot = await createRobot(newVal)
-      threeHelper.add(robot)
-    }
-    else if (newVal && !robot) {
-      robot = await createRobot(newVal)
-      threeHelper.add(robot)
-    }
-  })
+  }
 });
 
 onUnmounted(() => {
   threeHelper.dispose();
-  if (ws.value) {
-    unsubscribeFromTransformations(ws.value); // Clean up WebSocket connection
-    ws.value = null;
-  }
+  jointStateTopic.unsubscribe(); // Ensure to unsubscribe to clean up resources
 });
 </script>
 

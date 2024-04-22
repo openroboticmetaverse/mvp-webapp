@@ -29,6 +29,7 @@ export const useNavbarStore = defineStore("navbar", {
     },
     toggleDebug() {
       this.isDebugActive = !this.isDebugActive;
+      console.log(this.isDebugActive);
     },
   },
 });
