@@ -18,17 +18,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import BasePanel from '../ui/BasePanel.vue';
 import BaseCard from '../ui/BaseCard.vue';
 import ROSLIB from 'roslib';
+import { useNavbarStore } from '../../stores/store';
 
-const ros = new ROSLIB.Ros({
-    url: 'ws://localhost:9090'  // Replace with your ROS bridge server URL
+const ros = new ROSLIB.Ros();
+const jointStates = ref([]);
+const navbarStore = useNavbarStore();
+let topic = null;
+let isConnected = ref(false);  // Manage connection state explicitly
+
+watch(() => navbarStore.isDebugActive, (isActive) => {
+    if (isActive) {
+        if (!isConnected.value) {
+            ros.connect('ws://localhost:9090');
+        }
+    } else {
+        if (topic) {
+            topic.unsubscribe();
+            topic = null;
+        }
+        if (isConnected.value) {
+            ros.close();
+        }
+    }
 });
 
 ros.on('connection', () => {
     console.log('Connected to ROS.');
+    isConnected.value = true;
+    // Subscribe to the topic once connected
+    topic = new ROSLIB.Topic({
+        ros,
+        name: '/joint_states',
+        messageType: 'sensor_msgs/JointState'
+    });
+
+    topic.subscribe((message) => {
+        jointStates.value.push({
+            name: message.name,
+            position: message.position,
+            velocity: message.velocity,
+            effort: message.effort
+        });
+        if (jointStates.value.length > 10) {  // Limit the size to prevent memory issues
+            jointStates.value.shift();
+        }
+    });
 });
 
 ros.on('error', (error) => {
@@ -37,26 +75,15 @@ ros.on('error', (error) => {
 
 ros.on('close', () => {
     console.log('Connection to ROS closed.');
+    isConnected.value = false;
 });
 
-const topic = new ROSLIB.Topic({
-    ros,
-    name: '/joint_states',  // Subscribe to the /joint_states topic
-    messageType: 'sensor_msgs/JointState'
-});
-
-const jointStates = ref([]);
-
-topic.subscribe((message) => {
-    jointStates.value.push({
-        name: message.name,
-        position: message.position,
-        velocity: message.velocity,
-        effort: message.effort
-    });
-    // Optionally, limit the number of states stored
-    if (jointStates.value.length > 10) {
-        jointStates.value.shift();
+onUnmounted(() => {
+    if (topic) {
+        topic.unsubscribe();
+    }
+    if (isConnected.value) {
+        ros.close();
     }
 });
 </script>
