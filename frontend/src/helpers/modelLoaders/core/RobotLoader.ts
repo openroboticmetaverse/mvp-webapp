@@ -5,6 +5,9 @@ import { XacroLoader } from "xacro-parser";
 /**
  * The RobotLoader class is used to create a robot object from a specified URL.
  */
+const FRANKA_DESCRIPTION_URL = "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/";
+
+
 export default class RobotLoader {
   /**
    * Creates a robot object from the specified URL.
