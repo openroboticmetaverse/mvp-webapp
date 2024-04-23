@@ -84,7 +84,6 @@ async function createRobot(robotPath: string): Promise<Object> {
   });
   return robot;
 }
-
 // Function to apply joint states to robot's joints
 function applyJointStatesToRobot(robot: Object, jointStates: Object) {
   /**
@@ -98,6 +97,8 @@ function applyJointStatesToRobot(robot: Object, jointStates: Object) {
     const joint = robot.getObjectByName(jointName);
     if (joint) {
       joint.rotation.x = jointStates.position[index];  // Adjust transformation based on actual joint data
+      //console.log(`Joint ${jointName} position: ${jointStates.position[index]}`);
+
     }
   });
 }
