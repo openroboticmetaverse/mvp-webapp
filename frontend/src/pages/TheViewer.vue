@@ -74,24 +74,24 @@ onMounted(async () => {
 
       return gridPoints;
     }
-    console.log("starting ....,", isRunning)
     if (isRunning) {
-      console.log("starting ....")
       const pair = await createRobot(franka_arm);
       const manager = pair[1];
       let robot = pair[0];
+      // threeHelper.add(robot);
       manager.onLoad = () => {
+        console.log(robot)
         let xGrid = 4;
         let yGrid = 4;
         let step = 20;
 
         let xzPosList = generateGridPoints(xGrid * step, yGrid * step, step);
-
+        console.log(xzPosList)
         xzPosList.forEach(coord => {
           let clone = robot.clone();
           robots.push(clone);
           clone.position.x = coord.x;
-          clone.position.z = coord.z;
+          clone.position.z = coord.y;
           threeHelper.add(clone);
         })
 
