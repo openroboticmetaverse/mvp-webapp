@@ -1,4 +1,4 @@
-import { LoaderUtils, Object3D } from "three";
+import { LoaderUtils, Object3D, LoadingManager } from "three";
 import URDFLoader from "urdf-loader";
 import { XacroLoader } from "xacro-parser";
 
@@ -23,10 +23,11 @@ export default class RobotLoader {
       xacroLoader.load(
         _url,
         (xml) => {
-          const urdfLoader = new URDFLoader();
+          const manager = new LoadingManager();
+          const urdfLoader = new URDFLoader(manager);
           urdfLoader.workingPath = LoaderUtils.extractUrlBase(_url);
           const robot = urdfLoader.parse(xml);
-          resolve(robot);
+          resolve([robot, manager]);
         },
         (error) => {
           console.error("Error loading robot:", error);

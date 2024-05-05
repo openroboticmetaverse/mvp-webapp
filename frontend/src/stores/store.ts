@@ -6,8 +6,12 @@ export const useNavbarStore = defineStore("navbar", {
     isControlPanelActive: false,
     isPoseDisplayActive: false,
     isRobotBrowserActive: false,
+    isSimulationRunning: false,
   }),
   actions: {
+    toggleSimulation() {
+      this.isSimulationRunning = !this.isSimulationRunning;
+    },
     deactivateControlPanel() {
       this.isControlPanelActive = false;
     },
