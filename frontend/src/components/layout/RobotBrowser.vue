@@ -27,7 +27,8 @@
                     <template v-slot:description>
                         Who run the world
                     </template>
-                </base-item></base-card>
+                </base-item>
+                </base-card>
             </div>
 
         </template>
