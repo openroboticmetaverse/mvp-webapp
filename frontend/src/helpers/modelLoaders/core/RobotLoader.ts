@@ -1,4 +1,4 @@
-import { LoaderUtils, Object3D } from "three";
+import { LoaderUtils, Object3D, LoadingManager } from "three";
 import URDFLoader from "urdf-loader";
 import { XacroLoader } from "xacro-parser";
 
@@ -61,13 +61,14 @@ export default class RobotLoader {
           /**
            * URDFLoader instance used to parse URDF files.
            */
-          const urdfLoader = new URDFLoader();
+          const manager = new LoadingManager();
+          const urdfLoader = new URDFLoader(manager);
           urdfLoader.workingPath = LoaderUtils.extractUrlBase(_url);
           /**
            * Parse URDF XML and return the created robot object.
            */
           const robot = urdfLoader.parse(xml);
-          resolve(robot);
+          resolve([robot, manager]);
         },
         /**
          * Handle loading error.

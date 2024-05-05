@@ -11,6 +11,9 @@
         <BaseButton @click="toggleDebug()">
           <img class="w-8 h-6 md:w-10 sm:h-8 md:h-10" src="/src/assets/icons/bars-staggered.svg" alt="Debug" />
         </BaseButton>
+        <BaseButton @click="toggleSimulation(); deactivateRobotBrowser()">
+          <img class="w-8 h-8 md:w-10 md:h-10" src="/src/assets/icons/simulate.svg" alt="Transformation Panel" />
+        </BaseButton>
         <BaseButton @click="toggleRobotBrowser(); deactivatePoseDislay()">
           <img class="w-8 h-6 md:w-10 sm:h-8 md:h-10" src="/src/assets/icons/load.svg" alt="Load Model" />
         </BaseButton>
@@ -57,5 +60,8 @@ function toggleDebug() {
 }
 
 
+function toggleSimulation() {
+  navbarStore.toggleSimulation();
+}
 </script>
 <style></style>

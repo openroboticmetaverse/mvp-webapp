@@ -6,9 +6,13 @@ export const useNavbarStore = defineStore("navbar", {
     isControlPanelActive: false,
     isPoseDisplayActive: false,
     isRobotBrowserActive: false,
-    isDebugActive: false
+    isDebugActive: false,
+    isSimulationRunning: false,
   }),
   actions: {
+    toggleSimulation() {
+      this.isSimulationRunning = !this.isSimulationRunning;
+    },
     deactivateControlPanel() {
       this.isControlPanelActive = false;
     },
@@ -55,7 +59,7 @@ export const useRobotSelector = defineStore("selector", {
       this.selectedRobot = robotPath;
     },
     deselectRobot(robotPath: string) {
-      this.selectedRobot = ""
+      this.selectedRobot = "";
     },
   },
 });

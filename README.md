@@ -5,7 +5,7 @@
   </a>
 </p>
 <h1 align="center">
-  🤖 Open Robotic Metaverse MVP - Robotics Platform 🌐
+  🤖 open robotic metaverse mvp - robotics platform 🌐
 </h1>
 
 
