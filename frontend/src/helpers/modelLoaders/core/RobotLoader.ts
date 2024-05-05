@@ -5,8 +5,8 @@ import { XacroLoader } from "xacro-parser";
 /**
  * The RobotLoader class is used to create a robot object from a specified URL.
  */
-const FRANKA_DESCRIPTION_URL = "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/";
-
+const FRANKA_DESCRIPTION_URL =
+  "https://raw.githubusercontent.com/moveit/moveit_resources/ros2/panda_description/";
 
 export default class RobotLoader {
   /**
@@ -39,8 +39,13 @@ export default class RobotLoader {
      * @return {string} The URL of the package.
      */
     xacroLoader.rospackCommands = {
-      find(pkg) {
-        return pkg === "franka_description" ? FRANKA_DESCRIPTION_URL : pkg;
+      find: function (pkg) {
+        switch (pkg) {
+          case "moveit_resources_panda_description":
+            return "https://raw.githubusercontent.com/moveit/moveit_resources/ros2/panda_description";
+          case "franka_description":
+            return "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/";
+        }
       },
     };
 
@@ -77,4 +82,3 @@ export default class RobotLoader {
     });
   }
 }
-

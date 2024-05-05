@@ -28,7 +28,8 @@
                         <template v-slot:description>
                             Who run the world
                         </template>
-                    </base-item></base-card>
+                    </base-item>
+                </base-card>
             </div>
 
         </template>
@@ -48,6 +49,7 @@ const robotController = useRobotSelector()
 // TODO update links
 const franka_arm = ref("https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/robots/panda_arm_hand.urdf.xacro")
 const franka_dual_arm = ref("https://raw.githubusercontent.com/openroboticmetaverse/mvp-webapp/main/frontend/public/franka_description/robots/dual_panda_example.urdf.xacro")
+//const franka_config = ref("/home/karim/code/orom/mvp-webapp/frontend/public/panda_description/panda.urdf.xacro")
 
 function selectRobot(xacroPath: string) {
     robotController.selectRobot(xacroPath)

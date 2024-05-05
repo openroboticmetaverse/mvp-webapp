@@ -96,7 +96,7 @@ function applyJointStatesToRobot(robot: Object, jointStates: Object) {
   jointStates.name.forEach((jointName: string, index: number) => {
     const joint = robot.getObjectByName(jointName);
     if (joint) {
-      joint.rotation.x = jointStates.position[index];  // Adjust transformation based on actual joint data
+      joint.rotation.z = jointStates.position[index];  // Adjust transformation based on actual joint data
       //console.log(`Joint ${jointName} position: ${jointStates.position[index]}`);
 
     }
