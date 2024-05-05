@@ -10,6 +10,7 @@ import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
 
 import {
   subscribeToTransformations,
+  subscribeToTransformationsAll,
   unsubscribeFromTransformations,
 } from "../helpers/wsManager/core/wsManager"; // Assume unsubscribeFromTransformations is a method you have for unsubscribing
 import { useRobotController, useRobotSelector, useNavbarStore } from "../stores/store";
@@ -94,14 +95,16 @@ onMounted(async () => {
           clone.position.z = coord.y;
           threeHelper.add(clone);
         })
-
+        ws.value = subscribeToTransformationsAll(robots, 8081);
       }
     } else {
       robots.forEach(robot => {
         threeHelper.remove(robot);
       })
       // remove all saved
-      robots.splice(robots, robots.length)
+      robots.splice(robots, robots.length);
+      unsubscribeFromTransformations(ws.value);
+      ws.value = null;
     }
   });
 
