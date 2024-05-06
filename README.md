@@ -8,14 +8,12 @@
   🤖 open robotic metaverse mvp - robotics platform 🌐
 </h1>
 
-
-Yet another Vue 3 app ... 👾
-
 ## Overview 🔍
 
 This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
 
-![Demonstrator](demonstrator.png)
+![Image](https://github.com/openroboticmetaverse/mvp-webapp/assets/61633482/b013e674-8629-40a2-a3ab-8722bc8e0bfa)
+
 
 ## Key Features 🗝️
 
@@ -49,7 +47,7 @@ cd mvp-webapp
 docker compose up -d
 ```
 
-## Start the backend server 💻
+## Start the backend server 💻 (*Disabled for now*) Check [ros2_tdsi_backend](https://github.com/openroboticmetaverse/ros2-tdsi-backend) for ROS 2
 
 Open a console in the container 🖥️
 ```bash
