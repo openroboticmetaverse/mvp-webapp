@@ -1,4 +1,3 @@
-version: "3.4"
 services:
   mvp_frontend:
     container_name: mvp_frontend
