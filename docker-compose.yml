@@ -1,4 +1,3 @@
-version: "3.4"
 services:
   mvp_frontend:
     container_name: mvp_frontend
@@ -10,19 +9,19 @@ services:
     volumes:
       - ./frontend/:/var/www/html/app
     tty: true
-    # networks:
-    #   - tdsi-network
-      # networks:
-      #   tdsi-network:
-      #     external: true
-  mvp_backend:
-    container_name: mvp_backend
-    image: node:lts
-    working_dir: /var/www/html/backend/
-    entrypoint: /bin/bash
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./backend/:/var/www/html/backend
-    tty: true
+    networks:
+      - tdsi-network
+networks:
+  tdsi-network:
+    external: true
+# mvp_backend:
+#     container_name: mvp_backend
+#     image: node:lts
+#     working_dir: /var/www/html/backend/
+#     entrypoint: /bin/bash
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ./backend/:/var/www/html/backend
+#     tty: true
 
