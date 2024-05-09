@@ -15,7 +15,7 @@ export default class RobotLoader {
    * @param {string} _url - The URL of the robot.
    * @return {Promise<Object3D>} A promise that resolves to the created robot object.
    */
-  static createRobot(_url: string): Promise<Object3D> {
+  static createRobot(_url: string): Promise<[Object3D, LoadingManager]> {
     /**
      * Load robot from URL.
      *
@@ -39,7 +39,7 @@ export default class RobotLoader {
      * @return {string} The URL of the package.
      */
     xacroLoader.rospackCommands = {
-      find: function (pkg) {
+      find: function(pkg) {
         switch (pkg) {
           case "moveit_resources_panda_description":
             return "https://raw.githubusercontent.com/moveit/moveit_resources/ros2/panda_description";

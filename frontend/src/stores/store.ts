@@ -8,8 +8,12 @@ export const useNavbarStore = defineStore("navbar", {
     isRobotBrowserActive: false,
     isDebugActive: false,
     isSimulationRunning: false,
+    isRemoveAll: false,
   }),
   actions: {
+    toggleRemoveAll() {
+      this.isRemoveAll = !this.isRemoveAll;
+    },
     toggleSimulation() {
       this.isSimulationRunning = !this.isSimulationRunning;
     },
