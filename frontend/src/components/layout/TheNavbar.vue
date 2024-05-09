@@ -17,7 +17,7 @@
         <BaseButton @click="toggleRobotBrowser(); deactivatePoseDislay()">
           <img class="w-8 h-6 md:w-10 sm:h-8 md:h-10" src="/src/assets/icons/load.svg" alt="Load Model" />
         </BaseButton>
-        <BaseButton>
+        <BaseButton @click="toggleRemoveAll(); deactivatePoseDislay()">
           <img class="w-8 h-8 md:w-10 md:h-10" src="/src/assets/icons/remove.svg" alt="Remove Model" />
         </BaseButton>
         <BaseButton @click="toggleControlPanel">
@@ -59,6 +59,9 @@ function toggleDebug() {
   navbarStore.toggleDebug();
 }
 
+function toggleRemoveAll() {
+  navbarStore.toggleRemoveAll();
+}
 
 function toggleSimulation() {
   navbarStore.toggleSimulation();

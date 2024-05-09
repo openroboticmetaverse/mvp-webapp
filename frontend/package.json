@@ -13,6 +13,7 @@
     "roslib": "^1.4.1",
     "three": "^0.164.1",
     "typescript": "^5.3.3",
+    "uniqolor": "^1.1.1",
     "urdf-loader": "^0.12.1",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",
