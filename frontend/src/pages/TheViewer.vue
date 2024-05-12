@@ -30,7 +30,7 @@ import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
 import ROSLIB from 'roslib';
 import { Group, Vector3 } from "three";
 import { RobotProperty, RobotManager } from '../kernel/managers/RobotManager.ts';
-import { generateCirlceDistribution, generateGridDistribution} from '../kernel/Distribution.ts';
+import { generateCirlceDistribution, generateGridDistribution } from '../kernel/Distribution.ts';
 
 import uniqolor from 'uniqolor';
 import { useRobotController, useRobotSelector, useNavbarStore } from "../stores/store";
@@ -72,49 +72,91 @@ onMounted(async () => {
   //
 
   watch(() => navbarSelector.isRemoveAll, async (isRemoveAll) => {
-   robotManager.removeAll();
+    robotManager.removeAll();
   });
+
+  async function poseRobotsFacingEachOther() {
+    try {
+
+      const distance = 150; // Distance between the centers of the two robots
+
+      // Get connection details for the first robot
+      const url1 = prompt("Enter IP and port for the first robot (e.g., 192.168.1.2:9090):", "localhost:9090");
+      const robotProps1: RobotProperty = {
+        scale: new Vector3(100, 100, 100),
+        rotation: new Vector3(- Math.PI / 2, 0, 0), // Face towards the center
+        position: [new Vector3(-distance / 2, 0, 0)],
+        url: `ws://${url1}`,
+        color: 'red',
+        updateRobot: applyJointStatesToRobot,
+      };
+
+      // Get connection details for the second robot
+      const url2 = prompt("Enter IP and port for the second robot (e.g., 192.168.1.3:9090):", "localhost:9090");
+      const robotProps2: RobotProperty = {
+        scale: new Vector3(100, 100, 100),
+        rotation: new Vector3(-Math.PI / 2, 0, Math.PI), // Face towards the center
+        position: [new Vector3(distance / 2, 0, 0)],
+        url: `ws://${url2}`,
+        color: 'blue',
+        updateRobot: applyJointStatesToRobot,
+      };
+
+      // Add both robots to the scene
+      await robotManager.addSingleRobot("franka_arm", robotProps1);
+      await robotManager.addSingleRobot("franka_arm", robotProps2);
+    } catch (error) {
+      console.error("Failed to add the robots facing each other:", error);
+    }
+  }
   watch(() => navbarSelector.isSimulationRunning, async (isRunning) => {
-    let url = prompt("enter host:port");
-    let robotProps: RobotProperty = {
-      scale: new Vector3(10, 10, 10),
-      rotation: new Vector3(- Math.PI / 2, 0, 0),
-      position: generateGridDistribution(2, 2, 20),
-      // position: generateCirlceDistribution(4, 20),
-      url: `ws://${url}`,
-      color : uniqolor.random().color,
-      updateRobot: applyJointStatesToRobot,
+    if (isRunning) {
+      poseRobotsFacingEachOther();
     };
-    console.log(robotProps);
-   await robotManager.addRobots("franka_arm", robotProps);
+  });
+
+  /* watch(() => navbarSelector.isSimulationRunning, async (isRunning) => {
+   let url = prompt("enter host:port");
+   let robotProps: RobotProperty = {
+     scale: new Vector3(10, 10, 10),
+     rotation: new Vector3(- Math.PI / 2, 0, 0),
+     position: generateGridDistribution(2, 2, 20),
+     // position: generateCirlceDistribution(4, 20),
+     url: `ws://${url}`,
+     color : uniqolor.random().color,
+     updateRobot: applyJointStatesToRobot,
+   };
+   console.log(robotProps);
+  await robotManager.addRobots("franka_arm", robotProps);
+ }); */
+
+
+  // Watch for changes in robot activation and selected robot, and create or update robot accordingly
+  watch(() => robotController.isRobotActivated, async (newVal: boolean) => {
+    if (newVal) {
+      if (!robot && robotSelector.selectedRobot) {
+        robot = await createRobot(robotSelector.selectedRobot);
+      }
+    }
+  });
+  watch(() => robotSelector.selectedRobot, async (newVal: string) => {
+    if (newVal) {
+      if (robot) {
+        await threeHelper.remove(robot);
+        robot = await createRobot(newVal);
+      } else {
+        robot = await createRobot(newVal);
+      }
+    }
   });
 });
-
-// Watch for changes in robot activation and selected robot, and create or update robot accordingly
-watch(() => robotController.isRobotActivated, async (newVal: boolean) => {
-  if (newVal) {
-    if (!robot && robotSelector.selectedRobot) {
-      robot = await createRobot(robotSelector.selectedRobot);
-    }
-  }
-});
-watch(() => robotSelector.selectedRobot, async (newVal: string) => {
-  if (newVal) {
-    if (robot) {
-      await threeHelper.remove(robot);
-      robot = await createRobot(newVal);
-    } else {
-      robot = await createRobot(newVal);
-    }
-  }
-});
-
 // On component unmount, dispose of threeHelper and unsubscribe from ROS joint state topic
 onUnmounted(() => {
   robotManager.removeAll();
   threeHelper.dispose();
   jointStateTopic.unsubscribe();
 });
+
 </script>
 
 <style>
