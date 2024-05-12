@@ -9,7 +9,7 @@ export interface RobotProperty {
   position: Array<Vector3>;
   url: string,
   color: string,
-  updateRobot: (message, robot: Object3D) => void,
+  updateRobot: (robot: Object3D, message) => void,
 }
 export class RobotManager {
   static RobotMap: Map<string, string> = new Map<string, string>([
@@ -77,7 +77,7 @@ export class RobotManager {
       listener.subscribe((message) => {
         localIds.forEach((id) => {
           let robot = this.scene.getObjectById(id);
-          props.updateRobot(message, robot!);
+          props.updateRobot(robot!, message);
         })
       })
       this.listeners.set(listener, localIds);
