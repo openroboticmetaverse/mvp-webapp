@@ -5,7 +5,24 @@
             <div class="mb-auto m-2 rounded">
                 <div class="text-white p-4 font-bold uppercase text-left text-sm tracking-wide">
                     <!-- Display the title of the debug window -->
-                    Joint States
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    Joint States will be shown here for debugging purposes
+
                 </div>
                 <base-card>
                     <!-- Display a list of joint states, with each state containing name, position, velocity, and effort data -->

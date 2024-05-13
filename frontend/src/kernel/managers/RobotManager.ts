@@ -9,6 +9,7 @@ import {
   MeshBasicMaterial,
   BufferAttribute,
   BufferGeometry,
+  BoxGeometry,
   Group,
 } from "three";
 import { ThreeHelper } from "../../helpers/threeHelpers/core/ThreeHelper";
@@ -73,7 +74,26 @@ export class RobotManager {
           props.rotation.y,
           props.rotation.z
         );
-        this.scene.add(clonedModel);
+
+        // Create a group to contain the robot and the table
+        const group = new Group();
+        group.add(clonedModel);
+
+        // Adding a table underneath the robot
+        const tableGeometry = new BoxGeometry(100, 10, 100); // Dimensions of the table
+        const tableMaterial = new MeshBasicMaterial({ color: 0xf2d2d0 }); // Dark wood color
+        const table = new Mesh(tableGeometry, tableMaterial);
+        table.position.set(
+          props.position[0].x,
+          props.position[0].y,
+          props.position[0].z
+        ); // Adjust Y position to put it under the robot
+
+        group.add(table);
+
+        this.scene.add(group);
+        resolve();
+        //this.scene.add(clonedModel);
 
         const listener = this.createListener(props.url);
         listener.subscribe((message) => {

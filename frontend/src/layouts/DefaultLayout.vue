@@ -5,6 +5,7 @@
     <control-panel v-if="navbarStore.isControlPanelActive"></control-panel>
     <pose-display v-if="navbarStore.isPoseDisplayActive"></pose-display>
     <debug-window v-if="navbarStore.isDebugActive"></debug-window>
+    <info-panel></info-panel>
     <main>
       <router-view></router-view>
     </main>
@@ -18,6 +19,7 @@ import ControlPanel from "../components/layout/ControlPanel.vue";
 import PoseDisplay from "../components/layout/PoseDisplay.vue";
 import RobotBrowser from "../components/layout/RobotBrowser.vue";
 import DebugWindow from "../components/layout/DebugWindow.vue";
+import InfoPanel from "../components/layout/InfoPanel.vue"
 const navbarStore = useNavbarStore();
 </script>
 <style scoped></style>
