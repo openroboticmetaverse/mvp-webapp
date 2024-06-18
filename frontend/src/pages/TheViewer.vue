@@ -26,13 +26,9 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 
 // Import needed components and helpers
 import { ThreeHelper } from "../helpers/threeHelpers/core/ThreeHelper";
-import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
-import ROSLIB from 'roslib';
-import { Group, Vector3 } from "three";
+import { Vector3 } from "three";
 import { RobotProperty, RobotManager } from '../kernel/managers/RobotManager.ts';
-import { generateCirlceDistribution, generateGridDistribution } from '../kernel/Distribution.ts';
 
-import uniqolor from 'uniqolor';
 import { useRobotController, useRobotSelector, useNavbarStore } from "../stores/store";
 
 // Define refs for components and helpers
@@ -114,22 +110,6 @@ onMounted(async () => {
       poseRobotsFacingEachOther();
     };
   });
-
-  /* watch(() => navbarSelector.isSimulationRunning, async (isRunning) => {
-   let url = prompt("enter host:port");
-   let robotProps: RobotProperty = {
-     scale: new Vector3(10, 10, 10),
-     rotation: new Vector3(- Math.PI / 2, 0, 0),
-     position: generateGridDistribution(2, 2, 20),
-     // position: generateCirlceDistribution(4, 20),
-     url: `ws://${url}`,
-     color : uniqolor.random().color,
-     updateRobot: applyJointStatesToRobot,
-   };
-   console.log(robotProps);
-  await robotManager.addRobots("franka_arm", robotProps);
- }); */
-
 
   // Watch for changes in robot activation and selected robot, and create or update robot accordingly
   watch(() => robotController.isRobotActivated, async (newVal: boolean) => {
