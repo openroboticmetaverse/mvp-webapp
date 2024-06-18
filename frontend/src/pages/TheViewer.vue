@@ -87,20 +87,8 @@ onMounted(async () => {
         updateRobot: applyJointStatesToRobot,
       };
 
-      // Get connection details for the second robot
-      const url2 = prompt("Enter IP and port for the second robot (e.g., 192.168.1.3:9090):", "localhost:9090");
-      const robotProps2: RobotProperty = {
-        scale: new Vector3(100, 100, 100),
-        rotation: new Vector3(-Math.PI / 2, 0, Math.PI), // Face towards the center
-        position: [new Vector3(distance / 2, 0, 0)],
-        url: `ws://${url2}`,
-        color: 'blue',
-        updateRobot: applyJointStatesToRobot,
-      };
-
-      // Add both robots to the scene
+      // Add robot to the scene
       await robotManager.addSingleRobot("franka_arm", robotProps1);
-      await robotManager.addSingleRobot("franka_arm", robotProps2);
     } catch (error) {
       console.error("Failed to add the robots facing each other:", error);
     }

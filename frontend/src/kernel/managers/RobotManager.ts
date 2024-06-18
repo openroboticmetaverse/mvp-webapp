@@ -79,18 +79,6 @@ export class RobotManager {
         const group = new Group();
         group.add(clonedModel);
 
-        // Adding a table underneath the robot
-        const tableGeometry = new BoxGeometry(100, 10, 100); // Dimensions of the table
-        const tableMaterial = new MeshBasicMaterial({ color: 0xf2d2d0 }); // Dark wood color
-        const table = new Mesh(tableGeometry, tableMaterial);
-        table.position.set(
-          props.position[0].x,
-          props.position[0].y,
-          props.position[0].z
-        ); // Adjust Y position to put it under the robot
-
-        group.add(table);
-
         this.scene.add(group);
         resolve();
         //this.scene.add(clonedModel);
