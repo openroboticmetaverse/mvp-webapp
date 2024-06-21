@@ -49,7 +49,7 @@ function deactivatePoseDislay() {
 function togglePoseDislay() {
   navbarStore.togglePoseDisplay();
 }
-function deactivateRobotBrowser() {
+function deactivateRobotBrowser() { // TODO: Change naming to Model Browser
   navbarStore.deactivateRobotBrowser();
 }
 function toggleRobotBrowser() {
