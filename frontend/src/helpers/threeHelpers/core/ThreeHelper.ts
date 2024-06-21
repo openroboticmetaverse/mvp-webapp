@@ -46,7 +46,7 @@ export class ThreeHelper implements IThreeHelper {
     });
   }
 
-  public add(mesh): void {
+  public add(mesh: Object3D): void {
     console.log("Adding object to scene:", mesh);
     this.scene.add(mesh);
   }
@@ -59,7 +59,7 @@ export class ThreeHelper implements IThreeHelper {
     this.scene.clear();
   }
 
-  public remove(mesh): void {
+  public remove(mesh: Object3D): void {
     console.log("Removing object from scene:", mesh);
     this.scene.remove(mesh);
   }

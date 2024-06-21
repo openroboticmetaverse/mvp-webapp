@@ -7,37 +7,37 @@
                     <base-item @click="selectModel('cube')">
                         <template v-slot:image>
                             <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg"
-                                src="" alt="Cube">
+                                src="../../assets/icons/3d-cube.png" alt="Cube">
                         </template>
                         <template v-slot:title>
                             Cube
                         </template>
                         <template v-slot:description>
-                            A basic cube shape.
+                            A basic cube
                         </template>
                     </base-item>
                     <base-item @click="selectModel('sphere')">
                         <template v-slot:image>
                             <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg"
-                                src="" alt="Sphere">
+                                src="../../assets/icons/sphere.png" alt="Sphere">
                         </template>
                         <template v-slot:title>
                             Sphere
                         </template>
                         <template v-slot:description>
-                            A basic sphere shape.
+                            A basic sphere
                         </template>
                     </base-item>
                     <base-item @click="selectModel('cylinder')">
                         <template v-slot:image>
                             <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg"
-                                src="" alt="Cylinder">
+                                src="../../assets/icons/cylinder.png" alt="Cylinder">
                         </template>
                         <template v-slot:title>
                             Cylinder
                         </template>
                         <template v-slot:description>
-                            A basic cylinder shape.
+                            A basic cylinder
                         </template>
                     </base-item>
                 </base-card>
