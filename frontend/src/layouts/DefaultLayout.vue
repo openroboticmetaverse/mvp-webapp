@@ -8,7 +8,7 @@
     <info-panel></info-panel>
     <main>
       <router-view></router-view>
-      <scene-manager />
+      <TheViewer :selectedModel="selectedModel" />
     </main>
   </div>
 </template>
@@ -22,7 +22,7 @@ import PoseDisplay from "../components/layout/PoseDisplay.vue";
 import ModelBrowser from "../components/layout/ModelBrowser.vue";
 import DebugWindow from "../components/layout/DebugWindow.vue";
 import InfoPanel from "../components/layout/InfoPanel.vue";
-import SceneManager from "../kernel/managers/SceneManager.vue";
+import TheViewer from '../pages/TheViewer.vue';
 
 const navbarStore = useNavbarStore();
 const selectedModel = ref("");
