@@ -18,6 +18,8 @@ const canvas = ref<HTMLCanvasElement | null>(null); // Reference to the canvas e
 let threeHelper: ThreeHelper | null = null; // Instance of ThreeHelper for managing the Three.js scene
 let recentMesh: THREE.Mesh | null = null; // Reference to the most recently added mesh
 let transformControls: TransformControls | null = null; // Instance of TransformControls for manipulating objects
+let raycaster: THREE.Raycaster; // Raycaster for detecting object clicks
+const mouse = new THREE.Vector2(); // Vector for storing mouse position
 
 const navbarSelector = useNavbarStore(); // Access the navbar store
 
@@ -38,7 +40,35 @@ onMounted(() => {
       transformControls.addEventListener('dragging-changed', (event) => {
         threeHelper.controls.enabled = !event.value; // Enable/disable controls based on dragging state
       });
+
+      // Initialize raycaster for object selection
+      raycaster = new THREE.Raycaster();
+      canvas.value.addEventListener('mousedown', onMouseDown, false); // Add mouse down event listener
+
+      // Add keyboard shortcuts for TransformControls modes
+      window.addEventListener('keydown', function (event: KeyboardEvent) {
+        switch (event.key) {
+          case 't':
+            transformControls.setMode('translate')
+            break
+          case 'r':
+            transformControls.setMode('rotate')
+            break
+          case 's':
+            transformControls.setMode('scale')
+            break
+        }
+      })
     }
+
+    // Add a plane to the scene to receive shadows
+    const planeGeometry = new THREE.PlaneGeometry(100, 100);
+    const planeMaterial = new THREE.ShadowMaterial({ opacity: 0.2 });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = -1;
+    plane.receiveShadow = true;
+    threeHelper.add(plane);
 
     // Watch for changes to the selected model prop
     watch(() => props.selectedModel, (modelName) => {
@@ -63,6 +93,9 @@ onMounted(() => {
 onUnmounted(() => {
   if (threeHelper) {
     threeHelper.dispose(); // Dispose of the ThreeHelper instance to clean up resources
+  }
+  if (canvas.value) {
+    canvas.value.removeEventListener('mousedown', onMouseDown, false); // Remove mouse down event listener
   }
 });
 
@@ -96,11 +129,6 @@ function addModelToScene(modelName: string) {
     threeHelper.add(mesh); // Add the mesh to the scene
     recentMesh = mesh; // Track the most recently added mesh
     console.log("Model added to scene:", mesh);
-
-    // Attach TransformControls to the recent mesh
-    if (transformControls) {
-      transformControls.attach(recentMesh);
-    }
   }
 }
 
@@ -118,6 +146,40 @@ function removeRecentMesh() {
     console.log("No recent mesh to remove");
   }
 }
+
+// Function to handle mouse down event for selecting objects
+function onMouseDown(event: MouseEvent) {
+  event.preventDefault();
+
+  if (!canvas.value || !threeHelper) return;
+
+  // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
+  mouse.x = (event.clientX / canvas.value.clientWidth) * 2 - 1;
+  mouse.y = - (event.clientY / canvas.value.clientHeight) * 2 + 1;
+
+  // Update the raycaster with the camera and mouse position
+  raycaster.setFromCamera(mouse, threeHelper.camera);
+
+  // Calculate objects intersecting the raycaster
+  const intersects = raycaster.intersectObjects(threeHelper.scene.children, true);
+
+  if (intersects.length > 0) {
+    // Select the first intersected object
+    const selectedObject = intersects[0].object;
+    console.log("Selected object:", selectedObject);
+
+    // Attach TransformControls to the selected object
+    if (transformControls) {
+      transformControls.attach(selectedObject);
+    }
+  } else {
+    // Detach TransformControls if no object is selected
+    if (transformControls) {
+      transformControls.detach();
+    }
+  }
+}
+
 </script>
 
 <style>
