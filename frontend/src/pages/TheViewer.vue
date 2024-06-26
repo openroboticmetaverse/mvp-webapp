@@ -27,23 +27,20 @@ const navbarSelector = useNavbarStore(); // Access the navbar store
 onMounted(() => {
   if (canvas.value) {
     console.log("Canvas mounted");
-    threeHelper = new ThreeHelper(canvas.value); // Initialize ThreeHelper with the canvas
-    threeHelper.animate(); // Start the animation loop
+    threeHelper = new ThreeHelper(canvas.value);
+    threeHelper.animate();
 
-    // Initialize TransformControls
     if (threeHelper) {
       transformControls = new TransformControls(threeHelper.camera, threeHelper.renderer.domElement);
-      threeHelper.scene.add(transformControls); // Add TransformControls to the scene
+      threeHelper.scene.add(transformControls);
 
-      // Event listeners for TransformControls
       transformControls.addEventListener('change', () => threeHelper.renderer.render(threeHelper.scene, threeHelper.camera));
       transformControls.addEventListener('dragging-changed', (event) => {
-        threeHelper.controls.enabled = !event.value; // Enable/disable controls based on dragging state
+        threeHelper.controls.enabled = !event.value;
       });
 
-      // Initialize raycaster for object selection
       raycaster = new THREE.Raycaster();
-      canvas.value.addEventListener('mousedown', onMouseDown, false); // Add mouse down event listener
+      canvas.value.addEventListener('mousemove', onMouseMove, false);
 
       // Add keyboard shortcuts for TransformControls modes
       window.addEventListener('keydown', function (event: KeyboardEvent) {
@@ -92,10 +89,10 @@ onMounted(() => {
 // Lifecycle hook: onUnmounted
 onUnmounted(() => {
   if (threeHelper) {
-    threeHelper.dispose(); // Dispose of the ThreeHelper instance to clean up resources
+    threeHelper.dispose();
   }
   if (canvas.value) {
-    canvas.value.removeEventListener('mousedown', onMouseDown, false); // Remove mouse down event listener
+    canvas.value.removeEventListener('mousemove', onMouseMove, false);
   }
 });
 
@@ -124,6 +121,8 @@ function addModelToScene(modelName: string) {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 0);
   mesh.castShadow = true; // Enable shadows
+  mesh.userData.selectable = true;  // Make mesh selectable
+
 
   if (threeHelper) {
     threeHelper.add(mesh); // Add the mesh to the scene
@@ -148,36 +147,32 @@ function removeRecentMesh() {
 }
 
 // Function to handle mouse down event for selecting objects
-function onMouseDown(event: MouseEvent) {
+function onMouseMove(event: MouseEvent) {
   event.preventDefault();
 
   if (!canvas.value || !threeHelper) return;
 
-  // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
   mouse.x = (event.clientX / canvas.value.clientWidth) * 2 - 1;
   mouse.y = - (event.clientY / canvas.value.clientHeight) * 2 + 1;
 
-  // Update the raycaster with the camera and mouse position
   raycaster.setFromCamera(mouse, threeHelper.camera);
 
-  // Calculate objects intersecting the raycaster
-  const intersects = raycaster.intersectObjects(threeHelper.scene.children, true);
+  // Filter objects to only include those with the selectable property
+  const selectableObjects = threeHelper.scene.children.filter(obj => obj.userData && obj.userData.selectable);
+  const intersects = raycaster.intersectObjects(selectableObjects, true);
 
   if (intersects.length > 0) {
-    // Select the first intersected object
     const selectedObject = intersects[0].object;
-    console.log("Selected object:", selectedObject);
-
-    // Attach TransformControls to the selected object
-    if (transformControls) {
+    if (transformControls && selectedObject !== transformControls.object) {
       transformControls.attach(selectedObject);
     }
   } else {
-    // Detach TransformControls if no object is selected
     if (transformControls) {
       transformControls.detach();
     }
   }
+
+  threeHelper.renderer.render(threeHelper.scene, threeHelper.camera);
 }
 
 </script>
