@@ -18,18 +18,14 @@ export default class Robot {
 
   async parse(): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      let [robot, manager]: [Object3D, LoadingManager] = await RobotLoader.createRobot(this.url);
+      let [robot, manager]: [Object3D, LoadingManager] =
+        await RobotLoader.createRobot(this.url);
       manager.onLoad = () => {
         this.parsedModel = robot;
         this.isGeometryLoaded = true;
-        this.id = robot.id
+        this.id = robot.id;
         resolve();
-      }
-    })
-
-
-
-
-
+      };
+    });
   }
 }

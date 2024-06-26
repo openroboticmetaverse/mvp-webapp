@@ -1,6 +1,7 @@
 // navbarStore.js
 import { defineStore } from "pinia";
 
+// Navbar store
 export const useNavbarStore = defineStore("navbar", {
   state: () => ({
     isControlPanelActive: false,
@@ -17,31 +18,32 @@ export const useNavbarStore = defineStore("navbar", {
     toggleSimulation() {
       this.isSimulationRunning = !this.isSimulationRunning;
     },
-    deactivateControlPanel() {
-      this.isControlPanelActive = false;
-    },
     toggleControlPanel() {
       this.isControlPanelActive = !this.isControlPanelActive;
     },
-    deactivatePoseDisplay() {
-      this.isPoseDisplayActive = false;
-    },
     togglePoseDisplay() {
       this.isPoseDisplayActive = !this.isPoseDisplayActive;
-    },
-    deactivateRobotBrowser() {
-      this.isRobotBrowserActive = false;
     },
     toggleRobotBrowser() {
       this.isRobotBrowserActive = !this.isRobotBrowserActive;
     },
     toggleDebug() {
       this.isDebugActive = !this.isDebugActive;
-      console.log(this.isDebugActive);
+    },
+    deactivateControlPanel() {
+      this.isControlPanelActive = false;
+    },
+    deactivatePoseDisplay() {
+      this.isPoseDisplayActive = false;
+    },
+    deactivateRobotBrowser() {
+      this.isRobotBrowserActive = false;
     },
   },
 });
-export const useRobotController = defineStore("controller", {
+
+// Robot controller store
+export const useRobotController = defineStore("robotController", {
   state: () => ({
     isRobotActivated: false,
   }),
@@ -54,7 +56,9 @@ export const useRobotController = defineStore("controller", {
     },
   },
 });
-export const useRobotSelector = defineStore("selector", {
+
+// Robot selector store
+export const useRobotSelector = defineStore("robotSelector", {
   state: () => ({
     selectedRobot: "",
   }),
@@ -62,7 +66,7 @@ export const useRobotSelector = defineStore("selector", {
     selectRobot(robotPath: string) {
       this.selectedRobot = robotPath;
     },
-    deselectRobot(robotPath: string) {
+    deselectRobot() {
       this.selectedRobot = "";
     },
   },
