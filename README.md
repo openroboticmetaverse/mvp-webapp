@@ -8,6 +8,8 @@
   🤖 open robotic metaverse mvp - robotics platform 🌐
 </h1>
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a5a71d78-589b-47d6-85e7-8293bb8a7fdd/deploy-status)](https://app.netlify.com/sites/orom-mvp/deploys)
+
 ## Overview 🔍
 
 This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse, that brings robotic projects in one place. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
@@ -24,7 +26,7 @@ This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision
 ## Technology Stack 🛠️
 
 - **Frontend**: Developed using Vue 3 and Vite, offering a responsive and efficient user interface. 🌟
-- **Backend**: Powered by Node.js, ensuring robust server-side operations and data management. 💪
+- **Backend**: WIP💪
 
 
 
@@ -47,20 +49,6 @@ cd mvp-webapp
 docker compose up -d
 ```
 
-## Start the backend server 💻 (*Disabled for now*) Check [ros2_tdsi_backend](https://github.com/openroboticmetaverse/ros2-tdsi-backend) for ROS 2
-
-Open a console in the container 🖥️
-```bash
-docker exec -it mvp_backend /bin/bash
-```
-
-In the container console:
-```bash
-npm i
-```
-```bash
-npm run start
-```
 ## Start the frontend 🖼️
 
 (In a new terminal)
