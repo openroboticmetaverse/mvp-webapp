@@ -5,12 +5,18 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/frontend" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/frontend"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "deps"
     reviewers:
       - "karimsiala"
-      
+    open-pull-requests-limit: 1
+    labels:
+      - "dependencies"
+    groups:
+      all-updates:
+        patterns:
+          - "*"
