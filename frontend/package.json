@@ -11,7 +11,7 @@
   "dependencies": {
     "pinia": "^2.1.7",
     "roslib": "^1.4.1",
-    "three": "^0.164.1",
+    "three": "^0.166.0",
     "typescript": "^5.3.3",
     "uniqolor": "^1.1.1",
     "urdf-loader": "^0.12.1",
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/node": "^20.11.5",
     "@types/roslib": "^1.3.4",
-    "@types/three": "^0.163.0",
+    "@types/three": "^0.166.0",
     "@vitejs/plugin-vue": "^4.5.2",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
