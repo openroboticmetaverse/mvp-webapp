@@ -12,7 +12,7 @@
     "pinia": "^2.1.7",
     "roslib": "^1.4.1",
     "three": "^0.166.0",
-    "typescript": "^5.5.2",
+    "typescript": "^5.5.3",
     "uniqolor": "^1.1.1",
     "urdf-loader": "^0.12.1",
     "vue": "^3.4.31",
