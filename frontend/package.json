@@ -16,7 +16,7 @@
     "uniqolor": "^1.1.1",
     "urdf-loader": "^0.12.1",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5",
+    "vue-router": "^4.4.0",
     "xacro-parser": "^0.3.9"
   },
   "devDependencies": {
