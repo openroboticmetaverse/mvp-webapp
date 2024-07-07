@@ -104,7 +104,7 @@ Specify the following variables in the `.env` file inside the `backend` folder:
 | NODE_ENV             | Node environment (`development` or `production`) | String  | development |
 
 You can also specify environment variables when using `npx`:
-```bash
+
 npx mvp-webapp start --PORT=3000
 
 
