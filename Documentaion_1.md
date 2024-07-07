@@ -106,3 +106,17 @@ Specify the following variables in the `.env` file inside the `backend` folder:
 You can also specify environment variables when using `npx`:
 ```bash
 npx mvp-webapp start --PORT=3000
+
+
+## 📖 Contribute to Docs
+
+Contribute to the [MVP WebApp Documentation](https://github.com/openroboticmetaverse/mvp-webappDocs).
+
+## 🏷️ Pull Request Process
+
+A member of the MVP WebApp team will review your pull request. You can also reach out to us on [Discord](https://discord.gg/yourdiscordlink).
+
+## 📜 Code of Conduct
+
+This project and everyone participating in it are governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Report unacceptable behavior to [your-email@example.com](mailto:your-email@example.com).
+
