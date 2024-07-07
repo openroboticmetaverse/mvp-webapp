@@ -27,7 +27,7 @@ We welcome contributions! Please read `CONTRIBUTING.md` for details on our code 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 ## Contact
-For any inquiries, please contact [your-email@example.com](mailto:your-email@example.com).
+For any inquiries, please contact openroboticmetaverse@gmail.com.
 
 ### 2. **Add CONTRIBUTING.md**
 This file should guide potential contributors.
@@ -61,17 +61,18 @@ A code of conduct to foster a welcoming environment.
 We pledge to make participation in our project a harassment-free experience for everyone.
 
 ## Our Standards
-Examples of behavior that contributes to a positive environment include:
+Behaviour that contributes to a positive environment include:
 - Using welcoming and inclusive language.
 - Being respectful of differing viewpoints and experiences.
 - Gracefully accepting constructive criticism.
 
-Examples of unacceptable behavior:
+Unacceptable behaviour:
 - Trolling, insulting, or derogatory comments.
 - Public or private harassment.
 
 ## Enforcement
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at [your-email@example.com](mailto:your-email@example.com).
+Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported by contacting the project team at openroboticmetaverse@gmail.com
+.
 
 ### 4. **Add .gitignore**
 Ensure unnecessary files are not committed.
@@ -88,7 +89,7 @@ logs/
 dist/
 
 ### 5. **Add LICENSE**
-we already have the MIT license, which is great.
+We have a valid license from MIT
 
 ### 6. **Add Documentation Directory**
 Consider adding a `docs/` directory for more detailed project documentation.
@@ -96,7 +97,7 @@ Consider adding a `docs/` directory for more detailed project documentation.
 ### 7. **Maintain Documentation**
 Regularly update the documentation to reflect changes in the project.
 
-### Example Repository Structure:
+### Repository Structure:
 ```
 mvp-webapp/
 ├── README.md
