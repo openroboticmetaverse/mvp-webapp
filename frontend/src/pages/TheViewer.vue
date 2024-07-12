@@ -1,7 +1,14 @@
 <template>
-  <!-- Canvas element for rendering the Three.js scene -->
-  <canvas ref="canvas" class="canvas"></canvas>
+  <div>
+    <!-- Canvas element for rendering the Three.js scene -->
+    <canvas ref="canvas" class="canvas"></canvas>
+    <!-- Start Simulation button -->
+    <button @click="startSimulation">Start Simulation</button>
+    <!-- Display the message from the backend -->
+    <p v-if="simulationMessage">{{ simulationMessage }}</p>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue';
@@ -9,12 +16,14 @@ import { ThreeHelper } from '../helpers/threeHelpers/core/ThreeHelper';
 import * as THREE from 'three';
 import { useNavbarStore } from '../stores/store';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import axios from 'axios';
 
 const props = defineProps({
   selectedModel: String // Prop to receive the selected model name
 });
 
 const canvas = ref<HTMLCanvasElement | null>(null); // Reference to the canvas element
+const simulationMessage = ref<string>(''); // Data property to store the simulation message
 let threeHelper: ThreeHelper | null = null; // Instance of ThreeHelper for managing the Three.js scene
 let recentMesh: THREE.Mesh | null = null; // Reference to the most recently added mesh
 let transformControls: TransformControls | null = null; // Instance of TransformControls for manipulating objects
@@ -83,6 +92,30 @@ onMounted(() => {
         navbarSelector.isRemoveAll = false; // Reset the flag
       }
     });
+
+    // Watch for the simulation running flag in the navbar store
+    watch(() => navbarSelector.isSimulationRunning, async (isRunning) => {
+      if (isRunning) {
+        try {
+          const response = await axios.get('http://localhost:8001/');
+          // Log only the message from the backend response
+          console.log("The MSG IS", response.data.message);
+        } catch (error) {
+          console.error('Error starting simulation:', error);
+        }
+        let robotProps: RobotProperty = {
+          scale: new Vector3(10, 10, 10),
+          rotation: new Vector3(- Math.PI / 2, 0, 0),
+          position: generateGridDistribution(2, 2, 20),
+          url: `ws://your-fixed-url`,  // Replace with your actual URL
+          color: uniqolor.random().color,
+          updateRobot: applyJointStatesToRobot,
+        };
+        console.log(robotProps);
+        await robotManager.addRobots("franka_arm", robotProps);
+      }
+    });
+
   }
 });
 
