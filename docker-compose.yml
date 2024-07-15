@@ -1,27 +1,26 @@
+version: "3.9"
+
 services:
   mvp_frontend:
     container_name: mvp_frontend
-    image: node:lts
+    build:
+      context: ./frontend
     working_dir: /var/www/html/app/
-    entrypoint: /bin/bash
     ports:
       - "8000:8000"
     volumes:
       - ./frontend/:/var/www/html/app
+    command: ["npm", "run", "dev"]
     tty: true
-#    networks:
-#      - tdsi-network
-#networks:
-#  tdsi-network:
-#    external: true
-# mvp_backend:
-#     container_name: mvp_backend
-#     image: node:lts
-#     working_dir: /var/www/html/backend/
-#     entrypoint: /bin/bash
-#     ports:
-#       - "3000:3000"
-#     volumes:
-#       - ./backend/:/var/www/html/backend
-#     tty: true
 
+  mvp_backend:
+    container_name: mvp_backend
+    build:
+      context: ./backend
+    ports:
+      - "8001:80"
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
