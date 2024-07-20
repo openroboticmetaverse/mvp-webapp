@@ -7,8 +7,10 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { ThreeHelper } from '../helpers/threeHelpers/core/ThreeHelper';
 import * as THREE from 'three';
+import { Vector3 } from "three";
 import { useNavbarStore } from '../stores/store';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import { RobotManager, RobotProperty } from '../kernel/managers/RobotManager';
 
 const props = defineProps({
   selectedModel: String // Prop to receive the selected model name
@@ -20,6 +22,7 @@ let recentMesh: THREE.Mesh | null = null; // Reference to the most recently adde
 let transformControls: TransformControls | null = null; // Instance of TransformControls for manipulating objects
 let raycaster: THREE.Raycaster; // Raycaster for detecting object clicks
 const mouse = new THREE.Vector2(); // Vector for storing mouse position
+let robotManager: RobotManager;
 
 const navbarSelector = useNavbarStore(); // Access the navbar store
 
@@ -28,6 +31,7 @@ onMounted(() => {
   if (canvas.value) {
     console.log("Canvas mounted");
     threeHelper = new ThreeHelper(canvas.value);
+    robotManager = new RobotManager(threeHelper);
     threeHelper.animate();
 
     if (threeHelper) {
@@ -46,32 +50,33 @@ onMounted(() => {
       window.addEventListener('keydown', function (event: KeyboardEvent) {
         switch (event.key) {
           case 't':
-            transformControls.setMode('translate')
-            break
+            transformControls.setMode('translate');
+            break;
           case 'r':
-            transformControls.setMode('rotate')
-            break
+            transformControls.setMode('rotate');
+            break;
           case 's':
-            transformControls.setMode('scale')
-            break
+            transformControls.setMode('scale');
+            break;
+          case 'd':
+            // add robot
+            console.log('Add robot');
+            addFrankaRobot('franka_arm');
+            break;
         }
-      })
+      });
     }
 
-    // Add a plane to the scene to receive shadows
-    const planeGeometry = new THREE.PlaneGeometry(100, 100);
-    const planeMaterial = new THREE.ShadowMaterial({ opacity: 0.2 });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -1;
-    plane.receiveShadow = true;
-    threeHelper.add(plane);
 
     // Watch for changes to the selected model prop
     watch(() => props.selectedModel, (modelName) => {
       if (modelName) {
         console.log("Selected model changed:", modelName);
-        addModelToScene(modelName); // Add the selected model to the scene
+        if (modelName.startsWith('franka')) {
+          addFrankaRobot(modelName); // Add the selected Franka robot to the scene
+        } else {
+          addModelToScene(modelName); // Add the selected standard model to the scene
+        }
       }
     });
 
@@ -95,6 +100,43 @@ onUnmounted(() => {
     canvas.value.removeEventListener('mousemove', onMouseMove, false);
   }
 });
+
+watch(() => navbarSelector.isSimulationRunning, async (isRunning) => {
+  let url = prompt("enter host:port");
+  let robotProps: RobotProperty = {
+    scale: new Vector3(10, 10, 10),
+    rotation: new Vector3(- Math.PI / 2, 0, 0),
+    position: generateGridDistribution(2, 2, 20),
+    // position: generateCirlceDistribution(4, 20),
+    url: `ws://${url}`,
+    updateRobot: applyJointStatesToRobot,
+  };
+  console.log(robotProps);
+  await robotManager.addRobots("franka_arm", robotProps);
+});
+
+// Function to add a Franka robot to the scene
+async function addFrankaRobot(modelName: string) {
+  if (!robotManager) return;
+
+  const props: RobotProperty = {
+    scale: new Vector3(10, 10, 10),
+    rotation: new Vector3(- Math.PI / 2, 0, 0),
+    position: [new THREE.Vector3(0, 0, 0)],
+    url: 'ws://localhost:9090', // Update with your actual ROSBridge WebSocket URL
+    updateRobot: (robot, message) => {
+      console.log('Robot updated:', message);
+      // Update robot logic based on the message
+    }
+  };
+
+  try {
+    await robotManager.addSingleRobot(modelName, props);
+    console.log(`${modelName} robot added to the scene`);
+  } catch (error) {
+    console.error(`Failed to add ${modelName} robot to the scene:`, error);
+  }
+}
 
 // Function to add a model to the scene
 function addModelToScene(modelName: string) {
@@ -120,9 +162,7 @@ function addModelToScene(modelName: string) {
   const material = new THREE.MeshStandardMaterial({ color: 0x87CEEB }); // Light blue color
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 0);
-  mesh.castShadow = true; // Enable shadows
   mesh.userData.selectable = true;  // Make mesh selectable
-
 
   if (threeHelper) {
     threeHelper.add(mesh); // Add the mesh to the scene
@@ -174,7 +214,6 @@ function onMouseMove(event: MouseEvent) {
 
   threeHelper.renderer.render(threeHelper.scene, threeHelper.camera);
 }
-
 </script>
 
 <style>
