@@ -5,7 +5,5 @@ export class ThreeRenderer extends THREE.WebGLRenderer {
     super({ antialias: true, canvas: container });
     this.setSize(window.innerWidth, window.innerHeight);
     this.setPixelRatio(window.devicePixelRatio);
-    this.shadowMap.enabled = true; // Enable shadow mapping
-    this.shadowMap.type = THREE.PCFSoftShadowMap; // Optional: Choose shadow map type
   }
 }
