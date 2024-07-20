@@ -1,9 +1,11 @@
-import * as THREE from 'three'
+import * as THREE from "three";
 
 export class ThreeRenderer extends THREE.WebGLRenderer {
   constructor(container?: HTMLCanvasElement) {
-    super({ antialias: true, canvas: container })
-    this.setSize(window.innerWidth, window.innerHeight)
-    this.setPixelRatio(window.devicePixelRatio)
+    super({ antialias: true, canvas: container });
+    this.setSize(window.innerWidth, window.innerHeight);
+    this.setPixelRatio(window.devicePixelRatio);
+    this.shadowMap.enabled = true; // Enable shadow mapping
+    this.shadowMap.type = THREE.PCFSoftShadowMap; // Optional: Choose shadow map type
   }
 }
