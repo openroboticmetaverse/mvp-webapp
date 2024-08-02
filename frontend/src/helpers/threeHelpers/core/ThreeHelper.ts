@@ -23,14 +23,14 @@ export class ThreeHelper implements IThreeHelper {
     this.scene = new ThreeScene();
     this.camera = new ThreeCamera(window.innerWidth / window.innerHeight);
     this.renderer = new ThreeRenderer(this.container);
-    this.renderer.shadowMap.enabled = true; // Enable shadow map
+    this.renderer.shadowMap.enabled = false; // Enable shadow map
     this.controls = new ThreeControls(this.camera, this.renderer.domElement);
     this.grid = new ThreeGrid();
     this.lights = new ThreeLights();
 
     this.scene.add(this.grid.getGridMesh());
     this.lights.forEach((light) => {
-      light.castShadow = true; // Enable shadows for lights
+      light.castShadow = false; // Enable shadows for lights
       this.scene.add(light);
     });
     this.setupWindowResize(this.camera, this.renderer);
@@ -38,7 +38,7 @@ export class ThreeHelper implements IThreeHelper {
 
   private setupWindowResize(
     camera: ThreeCamera,
-    renderer: ThreeRenderer
+    renderer: ThreeRenderer,
   ): void {
     window.addEventListener("resize", () => {
       const width = window.innerWidth;
