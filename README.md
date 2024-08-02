@@ -9,7 +9,7 @@
 
 > ### Migration WIP
 >
-> We are currently migratin to React from Vue
+> Undergoing migration to React from Vue
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a5a71d78-589b-47d6-85e7-8293bb8a7fdd/deploy-status)](https://app.netlify.com/sites/orom-mvp/deploys)
 
@@ -17,7 +17,7 @@
 
 This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse, that brings robotic projects in one place. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
 
-![Image](https://github.com/openroboticmetaverse/mvp-webapp/assets/61633482/b013e674-8629-40a2-a3ab-8722bc8e0bfa)
+![image](https://github.com/user-attachments/assets/f2fa02dd-d040-4b77-be87-f2c0bf68eedc)
 
 ## Key Features 🗝️
 
