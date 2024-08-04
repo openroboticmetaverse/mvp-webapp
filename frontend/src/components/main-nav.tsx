@@ -40,7 +40,7 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
           </span>
         </div>
         <ToggleGroup className="flex flex-row gap-3 md:gap-10" type="single">
-          {navButtons.map(({ name, icon, tag }, index) => {
+          {navButtons.map(({ name, icon, tag }) => {
             return (
               <div key={tag}>
                 {" "}
