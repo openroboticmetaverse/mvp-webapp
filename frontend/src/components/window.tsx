@@ -1,5 +1,4 @@
-import { X } from "lucide-react";
-import React, { useState, useEffect, ReactElement } from "react";
+import { useState, useEffect, ReactElement } from "react";
 import RobotBrowser from "@/components/windows/robot-browser.tsx";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 
