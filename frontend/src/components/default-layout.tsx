@@ -9,6 +9,7 @@ const DefaultLayout = () => {
   };
   return (
     <div>
+      <div className="absolute top-2 right-5 text-white"> mvp v0.4</div>
       <MainNav onButtonClick={handleOpenedWindow} />
       <Window position="right" windowTag={openedWindow} />
     </div>
