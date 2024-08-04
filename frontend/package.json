@@ -24,7 +24,9 @@
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.167.0"
+    "three": "^0.167.0",
+    "urdf-loader": "^0.12.1",
+    "xacro-parser": "^0.3.9"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
