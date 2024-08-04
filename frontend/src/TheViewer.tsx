@@ -18,13 +18,13 @@ const TheViewer = ({ className }) => {
     if (threeHelper) {
       transformControls = new TransformControls(
         threeHelper.camera,
-        threeHelper.renderer.domElement,
+        threeHelper.renderer.domElement
       );
       threeHelper.scene.add(transformControls); // Add TransformControls to the scene
 
       // Event listeners for TransformControls
       transformControls.addEventListener("change", () =>
-        threeHelper.renderer.render(threeHelper.scene, threeHelper.camera),
+        threeHelper.renderer.render(threeHelper.scene, threeHelper.camera)
       );
       transformControls.addEventListener("dragging-changed", (event) => {
         threeHelper.controls.enabled = !event.value; // Enable/disable controls based on dragging state
