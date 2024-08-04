@@ -42,14 +42,20 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
         <ToggleGroup className="flex flex-row gap-3 md:gap-10" type="single">
           {navButtons.map(({ name, icon, tag }, index) => {
             return (
-              <TooltipProvider delayDuration={100} key={index}>
-                <Tooltip>
-                  <TooltipTrigger onClick={() => onButtonClick(tag)}>
-                    <ToggleGroupItem value={tag}>{icon}</ToggleGroupItem>
-                  </TooltipTrigger>
-                  <TooltipContent className="">{name}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <div key={tag}>
+                {" "}
+                {/* Assign key here */}
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div onClick={() => onButtonClick(tag)}>
+                        <ToggleGroupItem value={tag}>{icon}</ToggleGroupItem>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="">{name}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             );
           })}
         </ToggleGroup>
