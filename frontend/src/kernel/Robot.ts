@@ -18,14 +18,41 @@ export default class Robot {
 
   async parse(): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      let [robot, manager]: [Object3D, LoadingManager] =
-        await RobotLoader.createRobot(this.url);
-      manager.onLoad = () => {
-        this.parsedModel = robot;
-        this.isGeometryLoaded = true;
-        this.id = robot.id;
-        resolve();
-      };
+      try {
+        console.log(`Starting to load robot model from URL: ${this.url}`);
+        let [robot, manager]: [Object3D, LoadingManager] =
+          await RobotLoader.createRobot(this.url);
+
+        manager.onLoad = () => {
+          console.log(`Model loaded successfully: ${this.modelName}`);
+          this.parsedModel = robot;
+          this.isGeometryLoaded = true;
+          this.id = robot.id;
+          console.log(`Robot ID set to: ${this.id}`);
+          resolve();
+        };
+
+        manager.onError = (url) => {
+          console.error(`Error occurred while loading the model from: ${url}`);
+          reject(new Error(`Failed to load model from ${url}`));
+        };
+
+        manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+          console.log(
+            `Loading progress: ${itemsLoaded} of ${itemsTotal} items from ${url}.`
+          );
+        };
+      } catch (error) {
+        console.error(
+          `Failed to load robot model from URL: ${this.url}`,
+          error
+        );
+        reject(
+          new Error(
+            `Failed to load robot model from URL: ${this.url}: ${error.message}`
+          )
+        );
+      }
     });
   }
 }
