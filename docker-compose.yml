@@ -1,5 +1,5 @@
 services:
-  mvp_frontend:
+  mvp_frontend_react:
     container_name: mvp_frontend_react
     image: node:lts
     working_dir: /var/www/html/app/
