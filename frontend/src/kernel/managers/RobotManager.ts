@@ -20,6 +20,10 @@ export class RobotManager {
       "franka_dual_arm",
       "https://raw.githubusercontent.com/openroboticmetaverse/mvp-webapp/main/frontend/public/franka_description/robots/dual_panda_example.urdf.xacro",
     ],
+    [
+      "sawyer",
+      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description/urdf/sawyer_base.urdf.xacro",
+    ],
   ]);
 
   robots: Map<string, Robot>;
@@ -51,12 +55,48 @@ export class RobotManager {
       if (!robot || !robot.parsedModel) {
         throw new Error("Robot model not available or not parsed");
       }
+      robot.parsedModel.scale.set(props.scale.x, props.scale.y, props.scale.z);
+      robot.parsedModel.rotation.set(
+        props.rotation.x,
+        props.rotation.y,
+        props.rotation.z
+      );
+
+      /*       robot.parsedModel.setJointValue("panda_joint1", -1.57079);
+      robot.parsedModel.setJointValue("panda_joint2", 0.9);
+      robot.parsedModel.setJointValue("panda_joint3", 0.24);
+      robot.parsedModel.setJointValue("panda_joint4", -1.57079); */
+
+      //    <key name="home" qpos="0 0 0 -1.57079 0 1.57079 -0.7853 0.04 0.04" ctrl="0 0 0 -1.57079 0 1.57079 -0.7853 255"/>
 
       this.scene.add(robot.parsedModel);
       this.robotsId.push(robot.id);
     } catch (error: any) {
       console.error(`Error adding robot ${name}:`, error.message);
       throw new Error(`Error adding robot ${name}: ${error.message}`);
+    }
+  }
+
+  setJointAngles(robotName: string, jointName: string, angle: number): void {
+    const robot = this.robots.get(robotName);
+    if (robot && robot.parsedModel) {
+      robot.parsedModel.setJointValue(jointName, angle);
+    } else {
+      console.error(`Robot or joint not found: ${robotName}, ${jointName}`);
+    }
+  }
+
+  setJointAnglesFromMap(
+    robotName: string,
+    jointAngles: { [key: string]: number }
+  ): void {
+    const robot = this.robots.get(robotName);
+    if (robot && robot.parsedModel) {
+      Object.entries(jointAngles).forEach(([jointName, angle]) => {
+        robot.parsedModel?.setJointValue(jointName, angle);
+      });
+    } else {
+      console.error(`Robot not found: ${robotName}`);
     }
   }
 
