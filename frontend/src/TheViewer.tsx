@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 import { RobotManager, RobotProperty } from "./kernel/managers/RobotManager";
 import { Vector3 } from "three";
+import { transcode } from "buffer";
 
 const TheViewer = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -62,6 +63,10 @@ const TheViewer = () => {
         console.debug("Adding Franka robot to the scene");
         addRobot("franka_arm");
         return;
+      case "Sawyer":
+        console.debug("Adding sawyer robot to the scene");
+        addRobot("sawyer");
+        return;
       default:
         console.debug("Unknown model name:", modelName);
         return;
@@ -91,7 +96,7 @@ const TheViewer = () => {
     }
 
     const props: RobotProperty = {
-      scale: new Vector3(10, 10, 10),
+      scale: new Vector3(100, 100, 100),
       rotation: new Vector3(-Math.PI / 2, 0, 0),
       position: [new Vector3(0, 0, 0)],
     };
@@ -101,6 +106,23 @@ const TheViewer = () => {
       console.log(`${modelName} robot added to the scene`);
     } catch (error) {
       console.error(`Failed to add ${modelName} robot to the scene:`, error);
+    }
+    if (!robotManager.robots.has(modelName)) {
+      console.error(`Robot ${modelName} not found in the RobotManager`);
+    }
+
+    try {
+      const jointAngles = {
+        panda_joint1: -1.57079,
+        panda_joint2: -1.57079,
+        panda_joint3: 0.24,
+        panda_joint4: -1.57079,
+      };
+
+      robotManager.setJointAnglesFromMap(modelName, jointAngles);
+      console.log(`Joint angles set for ${modelName} robot`);
+    } catch (error) {
+      console.error(`Failed to set joint angles:`, error);
     }
   };
 
