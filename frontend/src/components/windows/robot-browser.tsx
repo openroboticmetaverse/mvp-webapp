@@ -31,6 +31,11 @@ const RobotBrowser = () => {
       description: "A Franka Emika robot arm",
       icon: <Bot size={50} />,
     },
+    {
+      name: "Sawyer",
+      description: "A Sawyer robot arm",
+      icon: <Bot size={50} />,
+    },
   ];
   return (
     <div className="flex flex-wrap  gap-5 ">
