@@ -1,10 +1,11 @@
 import { LoadingManager, Object3D } from "three";
 import RobotLoader from "../helpers/modelLoaders/core/RobotLoader";
+import { URDFRobot } from "urdf-loader";
 
 export default class Robot {
   modelName: string;
   url: string;
-  parsedModel: Object3D | null;
+  parsedModel: URDFRobot | null;
   id: number;
   isGeometryLoaded: boolean;
 
@@ -20,7 +21,7 @@ export default class Robot {
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`Starting to load robot model from URL: ${this.url}`);
-        let [robot, manager]: [Object3D, LoadingManager] =
+        let [robot, manager]: [URDFRobot, LoadingManager] =
           await RobotLoader.createRobot(this.url);
 
         manager.onLoad = () => {
