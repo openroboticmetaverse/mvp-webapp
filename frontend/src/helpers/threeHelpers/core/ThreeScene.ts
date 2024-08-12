@@ -1,9 +1,8 @@
-import * as THREE from 'three'
+import * as THREE from "three";
 
-export class ThreeScene extends THREE.Scene{
-
+export class ThreeScene extends THREE.Scene {
   constructor() {
-    super()
-    this.background = new THREE.Color(0x242635)
+    super();
+    this.background = new THREE.Color(0x242625);
   }
 }
