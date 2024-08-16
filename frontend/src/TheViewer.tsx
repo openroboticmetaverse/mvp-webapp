@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 import { RobotManager, RobotProperty } from "./kernel/managers/RobotManager";
 import { Vector3 } from "three";
-import { transcode } from "buffer";
 
 const TheViewer = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -13,7 +12,7 @@ const TheViewer = () => {
   const [robotManager, setRobotManager] = useState<RobotManager | null>(null);
   const [transformControls, setTransformControls] =
     useState<TransformControls | null>(null);
-  const { modelName } = useModel();
+  const { modelName, setModelUUID } = useModel();
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -67,6 +66,7 @@ const TheViewer = () => {
         console.debug("Adding sawyer robot to the scene");
         addRobot("sawyer");
         return;
+
       default:
         console.debug("Unknown model name:", modelName);
         return;
@@ -80,6 +80,7 @@ const TheViewer = () => {
 
       helper.add(mesh);
       console.log("Model added to scene:", mesh);
+      setModelUUID(mesh.id.toString());
 
       transformControls.attach(mesh);
 
@@ -124,6 +125,7 @@ const TheViewer = () => {
     } catch (error) {
       console.error(`Failed to set joint angles:`, error);
     }
+    setModelUUID(robotManager.robotsId[0].toString());
   };
 
   return (
