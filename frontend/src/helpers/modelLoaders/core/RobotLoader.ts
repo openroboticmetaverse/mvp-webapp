@@ -29,7 +29,7 @@ export default class RobotLoader {
           case "moveit_resources_panda_description":
             return "https://raw.githubusercontent.com/moveit/moveit_resources/ros2/panda_description";
           case "franka_description":
-            return "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description";
+            return "https://raw.githubusercontent.com/openroboticmetaverse/robot-description/main/packages/franka_description";
           case "sawyer":
             return "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description";
           case " robotiq_2f_85_gripper_visualization":
@@ -47,7 +47,7 @@ export default class RobotLoader {
           urdfLoader.workingPath = LoaderUtils.extractUrlBase(_url);
           // //Ayssar:TODO: must be dynamic
           urdfLoader.packages =
-            "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models";
+            "https://raw.githubusercontent.com/openroboticmetaverse/robot-description/main/packages";
           const robot = urdfLoader.parse(xml);
           resolve([robot, manager]);
         },

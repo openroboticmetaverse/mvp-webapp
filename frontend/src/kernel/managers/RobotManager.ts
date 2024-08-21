@@ -14,7 +14,7 @@ export class RobotManager {
   static RobotMap: Map<string, string> = new Map<string, string>([
     [
       "franka_arm",
-      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/robots/panda_arm_hand.urdf.xacro",
+      "https://raw.githubusercontent.com/openroboticmetaverse/robot-description/main/packages/franka_description/robots/panda_arm_hand.urdf.xacro",
     ],
     [
       "franka_dual_arm",
