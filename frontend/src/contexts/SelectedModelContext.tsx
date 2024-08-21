@@ -55,7 +55,7 @@ const ModelContextProvider = ({ children }: { children: ReactNode }) => {
   };
   const [modelInfoToRemove, setmodelInfoToRemove] = useState<modelInfo | null>(null);
   //console.log(modelInfoToRemove);
-  //console.log(sceneModelsInfoList);
+  console.log(sceneModelsInfoList);
   return (
     <ModelContext.Provider
       value={{

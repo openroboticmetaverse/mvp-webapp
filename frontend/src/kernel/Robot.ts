@@ -7,12 +7,14 @@ export default class Robot {
   url: string;
   parsedModel: URDFRobot | null;
   id: number;
+  uuid: string;
   isGeometryLoaded: boolean;
 
   constructor(name: string, url: string) {
     this.modelName = name;
     this.url = url;
     this.id = -1;
+    this.uuid="";
     this.parsedModel = null;
     this.isGeometryLoaded = false;
   }
@@ -29,6 +31,7 @@ export default class Robot {
           this.parsedModel = robot;
           this.isGeometryLoaded = true;
           this.id = robot.id;
+          this.uuid = robot.uuid;
           console.log(`Robot ID set to: ${this.id}`);
           resolve();
         };
@@ -43,7 +46,7 @@ export default class Robot {
             `Loading progress: ${itemsLoaded} of ${itemsTotal} items from ${url}.`
           );
         };
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Failed to load robot model from URL: ${this.url}`,
           error

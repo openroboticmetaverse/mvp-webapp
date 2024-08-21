@@ -65,7 +65,7 @@ const RobotBrowser = () => {
     <div className="flex flex-wrap  gap-5 ">
       {robotsList.map(({ name, description, icon, lastUpdated, id }) => {
         return (
-          <HoverCard openDelay={200} closeDelay={200}>
+          <HoverCard openDelay={200} closeDelay={200} key={name}>
             <HoverCardTrigger>
               <div
                 onClick={() => handleSelectedModel({name: name, id: id, uuid:''})}

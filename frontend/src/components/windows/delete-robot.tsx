@@ -13,7 +13,7 @@ const DeleteRobot = () => {
       if (modelToBeRemoved.id){
           setmodelInfoToRemove(modelToBeRemoved);
           removeModelInfo(modelToBeRemoved.id);
-          updateModelInfo(sceneModelsInfoList.at(-1));
+          //updateModelInfo(sceneModelsInfoList.at(-1));
       }
     }
     //modelToBeRemoved ? console.log(modelToBeRemoved.name, modelToBeRemoved.id): null;

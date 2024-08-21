@@ -61,11 +61,11 @@ const TheViewer = () => {
         break;
       case "Franka":
         console.debug("Adding Franka robot to the scene");
-        addRobot("franka_arm");
+      addRobot("franka_arm", modelInfo);
         return;
       case "Sawyer":
         console.debug("Adding sawyer robot to the scene");
-        addRobot("sawyer");
+      addRobot("sawyer", modelInfo);
         return;
       default:
         console.debug("Unknown model name:", modelInfo ? modelInfo.name: null);
@@ -99,7 +99,7 @@ const TheViewer = () => {
   }, [modelInfo, helper, transformControls]);
 
 
-  const addRobot = async (modelName: string) => {
+  const addRobot = async (modelName: string, modelToAdd: typeof modelInfo) => {
     if (!robotManager) {
       console.error("RobotManager is not initialized.");
       return;
@@ -131,6 +131,10 @@ const TheViewer = () => {
 
       robotManager.setJointAnglesFromMap(modelName, jointAngles);
       console.log(`Joint angles set for ${modelName} robot`);
+      if (modelToAdd){
+        if (modelToAdd.id)
+          updateModelInfoUUID(modelToAdd.id, robotManager.robotUUID)
+      }
     } catch (error) {
       console.error(`Failed to set joint angles:`, error);
     }

@@ -27,7 +27,9 @@ export class RobotManager {
   ]);
 
   robots: Map<string, Robot>;
+  robotUUID: string;
   robotsId: Array<number>;
+  robotsUUID: Array<string>;
   scene: ThreeHelper;
   groups: Array<Group>;
 
@@ -35,6 +37,8 @@ export class RobotManager {
     this.robots = new Map<string, Robot>();
     this.scene = scene;
     this.robotsId = new Array<number>();
+    this.robotsUUID = new Array<string>();
+    this.robotUUID = "";
     this.groups = new Array<Group>();
   }
 
@@ -71,6 +75,8 @@ export class RobotManager {
 
       this.scene.add(robot.parsedModel);
       this.robotsId.push(robot.id);
+      this.robotUUID = robot.uuid;
+      this.robotsUUID.push(robot.uuid);
     } catch (error: any) {
       console.error(`Error adding robot ${name}:`, error.message);
       throw new Error(`Error adding robot ${name}: ${error.message}`);
