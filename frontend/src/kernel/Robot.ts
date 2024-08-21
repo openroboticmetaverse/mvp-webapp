@@ -14,7 +14,9 @@ export default class Robot {
     this.modelName = name;
     this.url = url;
     this.id = -1;
-    this.uuid="";
+
+    this.uuid = "";
+
     this.parsedModel = null;
     this.isGeometryLoaded = false;
   }

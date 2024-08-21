@@ -10,6 +10,7 @@ interface modelInfo {
 // Define a data structure for exposing vairbales globally across all the 
 // child components
 interface ModelContextType {
+
   modelInfo: modelInfo | null;
   setModelInfo: (modelInfo: modelInfo) => void;
   updateModelInfo: (modelInfo: modelInfo) => void;
@@ -23,6 +24,7 @@ interface ModelContextType {
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
 const ModelContextProvider = ({ children }: { children: ReactNode }) => {
+
   // Store current model info 
   const [modelInfo, setModelInfo] = useState<modelInfo | null>(null);
   // Store the list of modelInfo of all models loaded in the scene
@@ -67,6 +69,7 @@ const ModelContextProvider = ({ children }: { children: ReactNode }) => {
         modelInfoToRemove,
         setmodelInfoToRemove,
         removeModelInfo,
+
       }}
     >
       {children}
@@ -78,7 +81,7 @@ const useModel = () => {
   const context = useContext(ModelContext);
   if (context === undefined) {
     throw new Error(
-      "useModelContext must be used within a ModelContextProvider",
+      "useModelContext must be used within a ModelContextProvider"
     );
   }
   return context;

@@ -14,7 +14,7 @@ export class RobotManager {
   static RobotMap: Map<string, string> = new Map<string, string>([
     [
       "franka_arm",
-      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/franka_description/robots/panda_arm_hand.urdf.xacro",
+      "https://raw.githubusercontent.com/openroboticmetaverse/robot-description/main/packages/franka_description/robots/panda_arm_hand.urdf.xacro",
     ],
     [
       "franka_dual_arm",
@@ -23,6 +23,14 @@ export class RobotManager {
     [
       "sawyer",
       "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description/urdf/sawyer_base.urdf.xacro",
+    ],
+    [
+      "ur5e",
+      "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/rolling/urdf/ur_macro.xacro",
+    ],
+    [
+      "iiwa14",
+      "https://raw.githubusercontent.com/kroshu/kuka_robot_descriptions/master/kuka_lbr_iiwa_support/urdf/lbr_iiwa14_r820.urdf.xacro",
     ],
   ]);
 
@@ -38,7 +46,9 @@ export class RobotManager {
     this.scene = scene;
     this.robotsId = new Array<number>();
     this.robotsUUID = new Array<string>();
+
     this.robotUUID = "";
+
     this.groups = new Array<Group>();
   }
 
@@ -75,7 +85,9 @@ export class RobotManager {
 
       this.scene.add(robot.parsedModel);
       this.robotsId.push(robot.id);
+
       this.robotUUID = robot.uuid;
+
       this.robotsUUID.push(robot.uuid);
     } catch (error: any) {
       console.error(`Error adding robot ${name}:`, error.message);
