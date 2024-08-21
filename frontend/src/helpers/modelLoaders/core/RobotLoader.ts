@@ -2,12 +2,6 @@ import { LoaderUtils, Object3D, LoadingManager } from "three";
 import URDFLoader, { URDFRobot } from "urdf-loader";
 import { XacroLoader } from "xacro-parser";
 
-/**
- * The RobotLoader class is used to create a robot object from a specified URL.
- */
-const FRANKA_DESCRIPTION_URL =
-  "https://raw.githubusercontent.com/moveit/moveit_resources/ros2/panda_description/";
-
 export default class RobotLoader {
   /**
    * Creates a robot object from the specified URL.
