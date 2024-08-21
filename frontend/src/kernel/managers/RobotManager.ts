@@ -35,6 +35,7 @@ export class RobotManager {
   ]);
 
   robots: Map<string, Robot>;
+  robotUUID: string;
   robotsId: Array<number>;
   robotsUUID: Array<string>;
   scene: ThreeHelper;
@@ -45,6 +46,9 @@ export class RobotManager {
     this.scene = scene;
     this.robotsId = new Array<number>();
     this.robotsUUID = new Array<string>();
+
+    this.robotUUID = "";
+
     this.groups = new Array<Group>();
   }
 
@@ -73,14 +77,17 @@ export class RobotManager {
       );
 
       /*       robot.parsedModel.setJointValue("panda_joint1", -1.57079);
-      robot.parsedModel.setJointValue("panda_joint2", 0.9);
-      robot.parsedModel.setJointValue("panda_joint3", 0.24);
-      robot.parsedModel.setJointValue("panda_joint4", -1.57079); */
+               robot.parsedModel.setJointValue("panda_joint2", 0.9);
+               robot.parsedModel.setJointValue("panda_joint3", 0.24);
+               robot.parsedModel.setJointValue("panda_joint4", -1.57079); */
 
       //    <key name="home" qpos="0 0 0 -1.57079 0 1.57079 -0.7853 0.04 0.04" ctrl="0 0 0 -1.57079 0 1.57079 -0.7853 255"/>
 
       this.scene.add(robot.parsedModel);
       this.robotsId.push(robot.id);
+
+      this.robotUUID = robot.uuid;
+
       this.robotsUUID.push(robot.uuid);
     } catch (error: any) {
       console.error(`Error adding robot ${name}:`, error.message);
@@ -111,7 +118,7 @@ export class RobotManager {
     }
   }
 
-  remove(id: number) {
+  remove(id: string) {
     const robot = this.scene.getObjectById(id);
     if (robot) {
       this.scene.remove(robot);

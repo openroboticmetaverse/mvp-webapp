@@ -14,7 +14,9 @@ export default class Robot {
     this.modelName = name;
     this.url = url;
     this.id = -1;
+
     this.uuid = "";
+
     this.parsedModel = null;
     this.isGeometryLoaded = false;
   }
@@ -46,7 +48,7 @@ export default class Robot {
             `Loading progress: ${itemsLoaded} of ${itemsTotal} items from ${url}.`
           );
         };
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Failed to load robot model from URL: ${this.url}`,
           error
