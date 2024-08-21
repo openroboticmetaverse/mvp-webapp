@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 import { RobotManager, RobotProperty } from "./kernel/managers/RobotManager";
 import { Vector3 } from "three";
-import { transcode } from "buffer";
+//import { transcode } from "buffer";
 
 const TheViewer = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -13,7 +13,7 @@ const TheViewer = () => {
   const [robotManager, setRobotManager] = useState<RobotManager | null>(null);
   const [transformControls, setTransformControls] =
     useState<TransformControls | null>(null);
-  const { modelName } = useModel();
+  const { modelInfo, updateModelInfoUUID, modelInfoToRemove  } = useModel();
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -49,7 +49,7 @@ const TheViewer = () => {
     if (!helper || !transformControls) return;
 
     let geometry: THREE.BufferGeometry | undefined;
-    switch (modelName) {
+    switch (modelInfo ? modelInfo.name: "no model selected") {
       case "Cube":
         geometry = new THREE.BoxGeometry(20, 20, 20);
         break;
@@ -68,7 +68,7 @@ const TheViewer = () => {
         addRobot("sawyer");
         return;
       default:
-        console.debug("Unknown model name:", modelName);
+        console.debug("Unknown model name:", modelInfo ? modelInfo.name: null);
         return;
     }
 
@@ -81,13 +81,23 @@ const TheViewer = () => {
       helper.add(mesh);
       console.log("Model added to scene:", mesh);
 
+      // NOTE: 
+      // To prevent Runtime errors, check if one of the above model is clicked.
+      // The check if react-generated id exist for that model.
+      // If both are true, identify that model and update its threejs generated
+      // uuid.
+      if (modelInfo){
+        if (modelInfo.id)
+          updateModelInfoUUID(modelInfo.id, mesh.uuid)
+      }
       transformControls.attach(mesh);
 
       return () => {
         transformControls.detach();
       };
     }
-  }, [modelName, helper, transformControls]);
+  }, [modelInfo, helper, transformControls]);
+
 
   const addRobot = async (modelName: string) => {
     if (!robotManager) {
@@ -125,6 +135,31 @@ const TheViewer = () => {
       console.error(`Failed to set joint angles:`, error);
     }
   };
+
+
+  const removeModel = (modelToBeRemoved: typeof modelInfo) => {
+    if (!helper || !transformControls){
+      console.error("ThreeHelper is not initialized.");
+      return;
+    }
+    if (modelToBeRemoved && modelToBeRemoved.uuid){
+      console.log(modelToBeRemoved.uuid)
+      const modelIdToRemove = helper.getObjectByUUID(modelToBeRemoved.uuid);
+      console.log("helper.scene");
+      console.log(helper);
+      console.log(helper.scene);
+      console.log(modelIdToRemove);
+      if (modelIdToRemove){
+        helper.remove(modelIdToRemove);
+        transformControls.detach();
+      }
+    }
+  };
+  useEffect(()=> {
+    if (modelInfoToRemove){
+      removeModel(modelInfoToRemove);
+    }
+  }, [modelInfoToRemove])
 
   return (
     <canvas ref={canvasRef} className="m-0 w-full h-full absolute"></canvas>

@@ -12,6 +12,7 @@ import {
   WebGLRenderer,
   WebGLRenderTarget,
 } from "three";
+import {Underline} from "lucide-react";
 
 export class ThreeHelper implements IThreeHelper {
   public scene: ThreeScene;
@@ -73,6 +74,15 @@ export class ThreeHelper implements IThreeHelper {
 
   public getObjectById(id: number): Object3D {
     return this.scene.getObjectById(id);
+  }
+
+  public getObjectByUUID(uuid: string): Object3D {
+    let foundObject: Object3D | undefined; 
+    this.scene.traverse((object) => {
+      if (object instanceof Object3D && object.uuid === uuid)
+        foundObject = object;
+    })
+    return foundObject;
   }
 
   public clear(): void {

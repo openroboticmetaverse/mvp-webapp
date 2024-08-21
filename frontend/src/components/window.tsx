@@ -1,5 +1,6 @@
 import { useState, useEffect, ReactElement } from "react";
 import RobotBrowser from "@/components/windows/robot-browser.tsx";
+import DeleteRobot from "@/components/windows/delete-robot";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 
 interface WindowProps {
@@ -20,7 +21,7 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
         setContent(<RobotBrowser />);
         break;
       case "delete":
-        setContent(<div>Delete Window</div>);
+        setContent(<DeleteRobot />);
         break;
       default:
         setContent(null);
