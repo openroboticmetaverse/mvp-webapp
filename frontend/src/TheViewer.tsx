@@ -19,7 +19,7 @@ const TheViewer = () => {
   const { modelInfo, updateModelInfoUUID, modelInfoToRemove } = useModel();
 
   // Define Leva controls for joint angles
-  const jointAngles = useControls("Motocortex", {
+  const jointAngles = useControls("Motocortex Robot", {
     Link1: { value: Math.PI / 4, min: -Math.PI, max: Math.PI },
     Link2: { value: Math.PI / 6, min: -Math.PI, max: Math.PI },
     Link3: { value: Math.PI / 3, min: -Math.PI, max: Math.PI },
@@ -28,7 +28,7 @@ const TheViewer = () => {
     Link6: { value: Math.PI, min: -Math.PI, max: Math.PI },
   });
 
-  const { toggle } = useControls("isActive", { toggle: true });
+  //const { toggle } = useControls("isActive", { toggle: true });
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -65,6 +65,21 @@ const TheViewer = () => {
 
     let geometry: THREE.BufferGeometry | undefined;
     switch (modelInfo ? modelInfo.name : "no model selected") {
+      case "Cube":
+        geometry = new THREE.BoxGeometry(20, 20, 20);
+        break;
+      case "Sphere":
+        geometry = new THREE.SphereGeometry(10, 32, 32);
+        break;
+      case "Cylinder":
+        geometry = new THREE.CylinderGeometry(10, 10, 20, 32);
+        break;
+      case "Plane":
+        geometry = new THREE.PlaneGeometry(10, 10);
+        break;
+      case "Torus":
+        geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+        break;
       case "Franka":
         console.debug("Adding Franka robot to the scene");
         addRobot("franka_arm", modelInfo);
@@ -85,6 +100,30 @@ const TheViewer = () => {
       default:
         console.debug("Unknown model name:", modelInfo ? modelInfo.name : null);
         return;
+    }
+
+    if (geometry) {
+      const material = new THREE.MeshMatcapMaterial({ color: 0x049ef4 });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(0, 0, 0);
+      mesh.castShadow = true;
+
+      helper.add(mesh);
+      console.log("Model added to scene:", mesh);
+
+      // NOTE:
+      // To prevent Runtime errors, check if one of the above model is clicked.
+      // The check if react-generated id exist for that model.
+      // If both are true, identify that model and update its threejs generated
+      // uuid.
+      if (modelInfo) {
+        if (modelInfo.id) updateModelInfoUUID(modelInfo.id, mesh.uuid);
+      }
+      transformControls.attach(mesh);
+
+      return () => {
+        transformControls.detach();
+      };
     }
   }, [modelInfo, helper, transformControls]);
 
