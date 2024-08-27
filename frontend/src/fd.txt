@@ -1,0 +1,32 @@
+.
+├── App.css
+├── App.tsx
+├── assets
+│   ├── favicon.ico
+│   ├── img.png
+│   └── react.svg
+├── components
+│   ├── default-layout.tsx
+│   ├── main-nav.tsx
+│   ├── ui
+│   ├── windows
+│   └── window.tsx
+├── contexts
+│   └── SelectedModelContext.tsx
+├── fd.txt
+├── helpers
+│   ├── modelLoaders
+│   ├── threeHelpers
+│   └── wsManager
+├── index.css
+├── kernel
+│   ├── Distribution.ts
+│   ├── managers
+│   └── Robot.ts
+├── lib
+│   └── utils.ts
+├── main.tsx
+├── TheViewer.tsx
+└── vite-env.d.ts
+
+12 directories, 17 files

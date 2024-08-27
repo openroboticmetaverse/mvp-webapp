@@ -1,11 +1,11 @@
 services:
-  mvp_frontend:
-    container_name: mvp_frontend
+  mvp_frontend_react:
+    container_name: mvp_frontend_react
     image: node:lts
     working_dir: /var/www/html/app/
     entrypoint: /bin/bash
     ports:
-      - "8000:8000"
+      - "5173:5173"
     volumes:
       - ./frontend/:/var/www/html/app
     tty: true

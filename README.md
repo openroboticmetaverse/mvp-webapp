@@ -1,4 +1,3 @@
-
 <p align="center">
   <a href="https://www.openroboticmetaverse.org">
     <img alt="orom" src="https://raw.githubusercontent.com/openroboverse/knowledge-base/main/docs/assets/icon.png" width="100" />
@@ -8,13 +7,17 @@
   🤖 open robotic metaverse mvp - robotics platform 🌐
 </h1>
 
+> ### Migration WIP
+>
+> Undergoing migration to React from Vue
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a5a71d78-589b-47d6-85e7-8293bb8a7fdd/deploy-status)](https://app.netlify.com/sites/orom-mvp/deploys)
 
 ## Overview 🔍
 
 This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse, that brings robotic projects in one place. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
 
-![Image](https://github.com/openroboticmetaverse/mvp-webapp/assets/61633482/b013e674-8629-40a2-a3ab-8722bc8e0bfa)
+![image](https://github.com/user-attachments/assets/26531ac3-e93b-4ad2-9bd1-1c82543c13a0)
 
 
 ## Key Features 🗝️
@@ -25,11 +28,8 @@ This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision
 
 ## Technology Stack 🛠️
 
-- **Frontend**: Developed using Vue 3 and Vite, offering a responsive and efficient user interface. 🌟
+- **Frontend**: Developed using Reac and Vite, offering a responsive and efficient user interface. 🌟
 - **Backend**: WIP💪
-
-
-
 
 ## Setup ⚙️
 
@@ -39,8 +39,13 @@ This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision
 git clone https://github.com/openroboticmetaverse/mvp-webapp.git
 
 ```
+
 ```bash
 cd mvp-webapp
+```
+
+```bash
+git switch migrate-react
 ```
 
 2. Docker Compose 🐳
@@ -54,16 +59,19 @@ docker compose up -d
 (In a new terminal)
 
 Open a console in the container 🖥️
+
 ```bash
-docker exec -it mvp_frontend /bin/bash
-```
-In the container console:
-```bash
-npm i
-```
-```bash
-npm run dev
+docker exec -it mvp_frontend_react /bin/bash
 ```
 
+In the container console:
+
+```bash
+yarn
+```
+
+```bash
+yarn dev --host
+```
 
 Enjoy 🎉🥳
