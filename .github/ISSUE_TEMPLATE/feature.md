@@ -7,20 +7,23 @@ assignees: ''
 
 ---
 
-<h2>✨ Desired Solution </h2>
-A straightforward description of the solution you have in mind.
+### ✨ Feature Overview
+Briefly describe the feature or improvement you are proposing.
 
-<h2>🔄 Alternatives Considered </h2>
-Outline any alternative solutions or features you've thought about.
+### 🎯 Objectives
+Outline the primary goals and what this feature aims to achieve.
 
-<h2>📚 Technical Details </h2>
-List the required libraries or dependencies if applicable.
+### 🚀 Proposed Solution
+Describe the solution in detail, including how it should work and its key components.
 
-<h2>🚧 Challenges and Roadblocks </h2>
-Identify any challenges or obstacles related to your feature request.
+### ⚙️ Technical Requirements
+List the necessary technologies, libraries, or frameworks required for implementation.
 
-<h2>💡 Examples and References </h2>
-If you have any examples or references that can help explain your request, please include them.
+### 🚧 Potential Challenges
+Identify any technical or non-technical challenges that could arise during development.
 
-<h2>🔗 Additional Context  </h2>
+### 📖 References and Inspirations
+Include links, examples, or documentation that can provide additional context or inspiration.
+
+### 🔗 Additional Context  
 Feel free to provide any additional context or relevant information about your feature request.
