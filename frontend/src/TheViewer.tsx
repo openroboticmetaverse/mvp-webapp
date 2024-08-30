@@ -8,6 +8,11 @@ import { useModel } from "@/contexts/SelectedModelContext.tsx";
 import { RobotManager, RobotProperty } from "./kernel/managers/RobotManager";
 import { Vector3 } from "three";
 
+/**
+ * TheViewer component
+ * Renders a 3D viewer for the scene
+ */
+
 const TheViewer = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [helper, setHelper] = useState<ThreeHelper | null>(null);
@@ -18,16 +23,20 @@ const TheViewer = () => {
 
   const { modelInfo, updateModelInfoUUID, modelInfoToRemove } = useModel();
 
+  const isMotocortexActive = false;
   // Define Leva controls for joint angles
-  const jointAngles = useControls("Motocortex Robot", {
-    Link1: { value: Math.PI / 4, min: -Math.PI, max: Math.PI },
-    Link2: { value: Math.PI / 6, min: -Math.PI, max: Math.PI },
-    Link3: { value: Math.PI / 3, min: -Math.PI, max: Math.PI },
-    Link4: { value: -Math.PI, min: -Math.PI, max: Math.PI },
-    Link5: { value: -Math.PI / 4, min: -Math.PI, max: Math.PI },
-    Link6: { value: Math.PI, min: -Math.PI, max: Math.PI },
-  });
-
+  const jointAngles = isMotocortexActive
+    ? useControls({
+        "Motocortex Robot": folder({
+          Link1: { value: Math.PI / 4, min: -Math.PI, max: Math.PI },
+          Link2: { value: Math.PI / 6, min: -Math.PI, max: Math.PI },
+          Link3: { value: Math.PI / 3, min: -Math.PI, max: Math.PI },
+          Link4: { value: -Math.PI, min: -Math.PI, max: Math.PI },
+          Link5: { value: -Math.PI / 4, min: -Math.PI, max: Math.PI },
+          Link6: { value: Math.PI, min: -Math.PI, max: Math.PI },
+        }),
+      })
+    : {};
   //const { toggle } = useControls("isActive", { toggle: true });
 
   useEffect(() => {
@@ -79,6 +88,9 @@ const TheViewer = () => {
         break;
       case "Torus":
         geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+        break;
+      case "Goal":
+        geometry = new THREE.IcosahedronGeometry(6, 0);
         break;
       case "Franka":
         console.debug("Adding Franka robot to the scene");
@@ -180,7 +192,12 @@ const TheViewer = () => {
     },
   ];
 
-  const loadGLTFRobot = (helper, transformControls, modelPath, modelToAdd) => {
+  const loadGLTFRobot = (
+    helper: ThreeHelper,
+    transformControls: TransformControls,
+    modelPath: string,
+    modelToAdd: typeof modelInfo
+  ) => {
     const loader = new GLTFLoader();
     loader.load(
       modelPath,
@@ -211,7 +228,11 @@ const TheViewer = () => {
     );
   };
 
-  const applyJointAngles = (model, jointConfig, jointAngles) => {
+  const applyJointAngles = (
+    model: THREE.Object3D,
+    jointConfig: Array<{ name: string; axis: string }>,
+    jointAngles: Record<string, number>
+  ) => {
     // Traverse the model to find specific joints
     model.traverse((child) => {
       if (child) {

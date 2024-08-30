@@ -4,7 +4,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Bot, Box, Cylinder, Globe, Square, Torus } from "lucide-react";
+import { Bot, Box, Cylinder, Globe, Goal, Square, Torus } from "lucide-react";
 import { useModel } from "@/contexts/SelectedModelContext.tsx";
 
 const RobotBrowser = () => {
@@ -50,6 +50,12 @@ const RobotBrowser = () => {
       name: "Torus",
       description: "A basic torus",
       icon: <Torus size={50} />,
+      id: Date.now(),
+    },
+    {
+      name: "Goal",
+      description: "A goal position for the robot",
+      icon: <Goal size={50} />,
       id: Date.now(),
     },
   ];
