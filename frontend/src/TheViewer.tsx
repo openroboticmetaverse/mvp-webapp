@@ -93,7 +93,8 @@ const TheViewer = () => {
         loadGLTFRobot(
           helper,
           transformControls,
-          "/MCX-Anthropomorphic-Robot-R01.glb"
+          "/MCX-Anthropomorphic-Robot-R01.glb",
+          modelInfo
         );
         return;
 
@@ -179,7 +180,7 @@ const TheViewer = () => {
     },
   ];
 
-  const loadGLTFRobot = (helper, transformControls, modelPath) => {
+  const loadGLTFRobot = (helper, transformControls, modelPath, modelToAdd) => {
     const loader = new GLTFLoader();
     loader.load(
       modelPath,
@@ -198,6 +199,9 @@ const TheViewer = () => {
         console.log("Applying joint angles to model:", jointAngles);
         applyJointAngles(model, jointConfig, jointAngles);
 
+        if (modelToAdd) {
+          if (modelToAdd.id) updateModelInfoUUID(modelToAdd.id, model.uuid);
+        }
         console.log("GLTF model loaded and added to scene:", model);
       },
       undefined,
