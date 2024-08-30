@@ -22,7 +22,7 @@ export class RobotManager {
     ],
     [
       "sawyer",
-      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description/urdf/sawyer_base.urdf.xacro",
+      "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description/urdf/sawyer_rocksi_arm.urdf.xacro",
     ],
     [
       "ur5e",
