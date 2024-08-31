@@ -23,20 +23,17 @@ const TheViewer = () => {
 
   const { modelInfo, updateModelInfoUUID, modelInfoToRemove } = useModel();
 
-  const isMotocortexActive = false;
   // Define Leva controls for joint angles
-  const jointAngles = isMotocortexActive
-    ? useControls({
-        "Motocortex Robot": folder({
-          Link1: { value: Math.PI / 4, min: -Math.PI, max: Math.PI },
-          Link2: { value: Math.PI / 6, min: -Math.PI, max: Math.PI },
-          Link3: { value: Math.PI / 3, min: -Math.PI, max: Math.PI },
-          Link4: { value: -Math.PI, min: -Math.PI, max: Math.PI },
-          Link5: { value: -Math.PI / 4, min: -Math.PI, max: Math.PI },
-          Link6: { value: Math.PI, min: -Math.PI, max: Math.PI },
-        }),
-      })
-    : {};
+
+  // Define Leva controls for joint angles
+  const jointAngles = useControls("Motocortex Robot", {
+    Link1: { value: Math.PI / 4, min: -Math.PI, max: Math.PI },
+    Link2: { value: Math.PI / 6, min: -Math.PI, max: Math.PI },
+    Link3: { value: Math.PI / 3, min: -Math.PI, max: Math.PI },
+    Link4: { value: -Math.PI, min: -Math.PI, max: Math.PI },
+    Link5: { value: -Math.PI / 4, min: -Math.PI, max: Math.PI },
+    Link6: { value: Math.PI, min: -Math.PI, max: Math.PI },
+  });
   //const { toggle } = useControls("isActive", { toggle: true });
 
   useEffect(() => {
