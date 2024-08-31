@@ -5,6 +5,6 @@ export class ThreeCamera extends THREE.PerspectiveCamera {
   constructor(aspectRatio: number) {
     super(FOV, aspectRatio, NEAR, FAR);
 
-    this.position.set(400, 50, 120);
+    this.position.set(200, 70, 120);
   }
 }

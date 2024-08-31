@@ -35,7 +35,7 @@ export class ThreeLights {
    * @return {void} This function does not return a value.
    */
   constructor() {
-    const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xfffdf5); // Ambient light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
     directionalLight.position.set(10, 10, 10);
     directionalLight.castShadow = true; // Enable shadows
