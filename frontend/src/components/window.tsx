@@ -1,7 +1,6 @@
 import { useState, useEffect, ReactElement } from "react";
 import RobotBrowser from "@/components/windows/robot-browser.tsx";
 import DeleteRobot from "@/components/windows/delete-robot";
-import { useModel } from "@/contexts/SelectedModelContext.tsx";
 
 interface WindowProps {
   position: "left" | "right";
@@ -11,11 +10,10 @@ interface WindowProps {
 const Window = ({ position = "left", windowTag }: WindowProps) => {
   const computedPosition = position === "left" ? "left-16" : "right-16";
   const [content, setContent] = useState<ReactElement | null>(null);
-  const { sceneModelsList } = useModel();
+
   useEffect(() => {
     switch (windowTag) {
       case "start":
-        setContent(<div>{sceneModelsList.map((model) => model)}</div>);
         break;
       case "robot-browser":
         setContent(<RobotBrowser />);

@@ -1,25 +1,17 @@
-import WindowCard from "@/components/ui/window-card.tsx";
+import WindowCard from "@/components/ui/window-card";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Bot, Box, Cylinder, Globe, Goal, Square, Torus } from "lucide-react";
-import { useModel } from "@/contexts/SelectedModelContext.tsx";
+import useModelStore from "../../stores/model-store";
+import { useCallback } from "react";
 
 const RobotBrowser = () => {
-  // Load the global context function to update the recently selected model info
-  // and the list of infos of all the models loaded in the scene
-  const { setModelInfo } = useModel();
+  const { setCurrentModel, addSceneModel } = useModelStore();
 
-  // Define the list of available models infos
-  // TODO: Each modelInfo should have a name, a react-generated unique id and a
-  // threejs-generated unique uuid.
-  // The react-generated unique id should be used to identify and delete the model.
-  // The threejs-generated  uuid can be used to delete the mesh.
-  // For now, the loaded models such as franka, sawyer use the same uuid as the
-  // mesh is just imported from an external urdf file. Therefore, uuid can't be
-  // used to delete the robots.
+  // Define the list of available models
   const shapesList = [
     {
       name: "Cube",
@@ -78,75 +70,69 @@ const RobotBrowser = () => {
       description: "A Motocortex robot arm",
       icon: <Bot size={50} />,
       id: Date.now(),
+      lastUpdated: "August 2024",
     },
   ];
 
-  // Update the global context vairbales  `modelInfo` and `sceneModelsInfoList`
-  // when the user clicks on the model icon div.
-  const handleSelectedModel = (modelInfo: {
-    name: string;
-    id: number;
-    uuid: string;
-  }) => {
-    setModelInfo(modelInfo);
-  };
+  // Update the Zustand store when the user clicks on a model icon
+  const handleSelectedModel = useCallback(
+    (modelInfo: { name: string; id: number; uuid: string | null }) => {
+      // Generate a unique ID for the new model
+      const uniqueId = Date.now();
+      const newModel = { ...modelInfo, id: uniqueId, uuid: null };
+
+      console.log("Selected model:", newModel);
+
+      // Set the current model and add it to the scene
+      setCurrentModel(newModel);
+      addSceneModel(newModel);
+    },
+    [setCurrentModel, addSceneModel]
+  );
+
+  const renderModelList = useCallback(
+    (models: typeof shapesList) => (
+      <div className="flex flex-wrap gap-6">
+        {models.map(({ name, description, icon, lastUpdated }) => (
+          <HoverCard
+            key={`${name}-${Date.now()}`}
+            openDelay={200}
+            closeDelay={200}
+          >
+            <HoverCardTrigger>
+              <div
+                onClick={() =>
+                  handleSelectedModel({ name, id: Date.now(), uuid: null })
+                }
+                className="rounded border hover:bg-white p-2
+                hover:bg-opacity-25 hover:text-muted cursor-pointer"
+              >
+                {icon}
+              </div>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <WindowCard
+                description={description}
+                title={name}
+                lastUpdated={lastUpdated}
+              />
+            </HoverCardContent>
+          </HoverCard>
+        ))}
+      </div>
+    ),
+    [handleSelectedModel]
+  );
 
   return (
     <div className="flex flex-col gap-8">
       <div>
         <h2 className="text-xl font-semibold mb-4">Primitive Shapes</h2>
-        <div className="flex flex-wrap gap-6">
-          {shapesList.map(({ name, description, icon, lastUpdated, id }) => (
-            <HoverCard openDelay={200} closeDelay={200} key={name}>
-              <HoverCardTrigger>
-                <div
-                  onClick={() =>
-                    handleSelectedModel({ name: name, id: id, uuid: "" })
-                  }
-                  className="rounded border hover:bg-white p-2
-                  hover:bg-opacity-25 hover:text-muted cursor-pointer"
-                >
-                  {icon}
-                </div>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <WindowCard
-                  description={description}
-                  title={name}
-                  lastUpdated={lastUpdated}
-                />
-              </HoverCardContent>
-            </HoverCard>
-          ))}
-        </div>
+        {renderModelList(shapesList)}
       </div>
-
       <div>
         <h2 className="text-xl font-semibold mb-4">Robots</h2>
-        <div className="flex flex-wrap gap-6">
-          {robotsList.map(({ name, description, icon, lastUpdated, id }) => (
-            <HoverCard openDelay={200} closeDelay={200} key={name}>
-              <HoverCardTrigger>
-                <div
-                  onClick={() =>
-                    handleSelectedModel({ name: name, id: id, uuid: "" })
-                  }
-                  className="rounded border hover:bg-white p-2
-                  hover:bg-opacity-25 hover:text-muted cursor-pointer"
-                >
-                  {icon}
-                </div>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <WindowCard
-                  description={description}
-                  title={name}
-                  lastUpdated={lastUpdated}
-                />
-              </HoverCardContent>
-            </HoverCard>
-          ))}
-        </div>
+        {renderModelList(robotsList)}
       </div>
     </div>
   );

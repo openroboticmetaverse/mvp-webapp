@@ -1,46 +1,36 @@
-import { useModel } from "@/contexts/SelectedModelContext.tsx";
-
+import useModelStore from "@/stores/model-store";
+import { useCallback } from "react";
 
 const DeleteRobot = () => {
-  const {
-    modelInfo,
-    updateModelInfo,
-    sceneModelsInfoList,
-    setmodelInfoToRemove,
-    removeModelInfo} = useModel();
-  const handleSelectedModel = (modelToBeRemoved: typeof modelInfo) => {
-    if(modelToBeRemoved){
-      if (modelToBeRemoved.id){
-          setmodelInfoToRemove(modelToBeRemoved);
-          removeModelInfo(modelToBeRemoved.id);
-          //updateModelInfo(sceneModelsInfoList.at(-1));
-      }
-    }
-    //modelToBeRemoved ? console.log(modelToBeRemoved.name, modelToBeRemoved.id): null;
-  };
+  const { sceneModels, setModelToRemove } = useModelStore();
+
+  const handleDeleteModel = useCallback(
+    (model: ModelInfo) => {
+      console.log("Triggering deletion for model:", model);
+      setModelToRemove(model);
+    },
+    [setModelToRemove]
+  );
 
   return (
-    <div className="flex flex-wrap gap-5">
-      <h3>Recently loaded Model: {modelInfo ? modelInfo.name: 'No active model in the scene'}</h3>
-      <h3>List of all loaded Models: </h3>
-      {
-        sceneModelsInfoList.length === 0 ? (
-          <p> No models available to view</p>
+    <div className="flex flex-col gap-5">
+      <h3>Models in the Scene: </h3>
+      <div className="flex flex-wrap gap-3">
+        {sceneModels.length === 0 ? (
+          <p>No models in the scene</p>
         ) : (
-        sceneModelsInfoList.map((model) => {
-          return (
+          sceneModels.map((model, index) => (
             <div
-              key={model.id}
-              onClick={() => handleSelectedModel(model)}
+              key={`${model.id}-${model.name}-${index}`}
+              onClick={() => handleDeleteModel(model)}
               className="rounded border hover:bg-white p-2 
               hover:bg-opacity-25 hover:text-muted cursor-pointer"
             >
-              { model.name }
+              {model.name}
             </div>
-          );
-        })
-        )
-      }
+          ))
+        )}
+      </div>
     </div>
   );
 };
