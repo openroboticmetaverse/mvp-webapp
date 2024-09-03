@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 
 import {
@@ -23,19 +23,22 @@ const Scene = () => {
 
   console.log(scenes);
 
-  const gridConfig = {
-    cellSize: 1,
-    cellThickness: 1,
-    cellColor: "#6f6f6f",
-    sectionSize: 10,
-    sectionThickness: 1.5,
-    sectionColor: "#6f6f6f",
-    fadeDistance: 100,
-    fadeStrength: 1,
-    followCamera: true,
-    infiniteGrid: true,
-    fadeFrom: 0.5,
-  };
+  const gridConfig = useMemo(
+    () => ({
+      cellSize: 1,
+      cellThickness: 1,
+      cellColor: "#6f6f6f",
+      sectionSize: 10,
+      sectionThickness: 1.5,
+      sectionColor: "#6f6f6f",
+      fadeDistance: 100,
+      fadeStrength: 1,
+      followCamera: false,
+      infiniteGrid: true,
+      fadeFrom: 0.5,
+    }),
+    []
+  );
 
   useEffect(() => {
     if (scenes.length === 0) {
@@ -74,7 +77,7 @@ const Scene = () => {
       <pointLight position={[10, 10, 10]} castShadow />
       <Grid position={[0, -0.01, 0]} sire={1000} {...gridConfig} />
       <StatsGl />
-      <Shadows />
+      {/*       <Shadows /> */}
 
       <group onClick={() => setSelectedObject(null)}>
         {scenes.map((scene) => (
