@@ -1,11 +1,14 @@
-import React, { forwardRef, useMemo } from "react";
+import React, { forwardRef, useMemo, useEffect, useRef } from "react";
 import { Vector3, Euler } from "three";
 import { GeometricObject } from "../interfaces/SceneInterfaces";
 import * as THREE from "three";
+import { useSceneStore } from "../stores/SceneStore";
 
 interface GeometricObjectProps extends GeometricObject {
-  selected: boolean;
   onClick: (event: React.MouseEvent) => void;
+  onPointerMissed: (event: React.MouseEvent) => void;
+  onContextMenu: (event: React.MouseEvent) => void;
+  selected: boolean;
 }
 
 export const GeometricObjectComponent = forwardRef<
@@ -21,11 +24,23 @@ export const GeometricObjectComponent = forwardRef<
       scale,
       color,
       shape = "box",
-      selected,
       onClick,
+      onPointerMissed,
+      onContextMenu,
+      selected,
     },
     ref
   ) => {
+    const localRef = useRef<THREE.Mesh>(null);
+
+    useEffect(() => {
+      if (localRef.current) {
+        localRef.current.position.set(...position);
+        localRef.current.rotation.set(...orientation);
+        localRef.current.scale.set(...scale);
+      }
+    }, [position, orientation, scale]);
+
     const GeometryComponent = useMemo(() => {
       switch (shape) {
         case "sphere":
@@ -44,16 +59,22 @@ export const GeometricObjectComponent = forwardRef<
 
     return (
       <mesh
-        ref={ref}
-        position={position}
-        rotation={orientation}
-        scale={scale}
+        ref={(el) => {
+          localRef.current = el;
+          if (typeof ref === "function") {
+            ref(el);
+          } else if (ref) {
+            ref.current = el;
+          }
+        }}
         onClick={onClick}
+        onPointerMissed={onPointerMissed}
+        onContextMenu={onContextMenu}
         name={name}
       >
         {GeometryComponent}
         <meshStandardMaterial
-          color={color}
+          color={selected ? "#ff6080" : color}
           emissive={selected ? 0x555555 : undefined}
         />
       </mesh>
