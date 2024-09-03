@@ -1,9 +1,8 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { useSceneStore } from "../stores/SceneStore";
 import { Scene, GeometricObject, Robot } from "../interfaces/SceneInterfaces";
 import { GeometricObjectComponent } from "./GeometricObjectComponent";
-// import { RobotComponent } from "./RobotComponent";
-import { TransformControls, OrbitControls } from "@react-three/drei";
+import { TransformControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -15,16 +14,18 @@ const SceneComponent: React.FC<SceneComponentProps> = ({ id, name }) => {
   const getObjectsBySceneId = useSceneStore(
     (state) => state.getObjectsBySceneId
   );
+  const updateObject = useSceneStore((state) => state.updateObject);
   const selectedObjectId = useSceneStore((state) => state.selectedObjectId);
   const setSelectedObject = useSceneStore((state) => state.setSelectedObject);
+  const transformMode = useSceneStore((state) => state.transformMode);
+  const cycleTransformMode = useSceneStore((state) => state.cycleTransformMode);
+
   const objects = getObjectsBySceneId(id);
 
   console.log(`Selected object ID: ${selectedObjectId}`);
   console.log(`Number of objects in scene: ${objects.length}`);
 
   const objectRefs = useRef<{ [key: string]: THREE.Object3D | null }>({});
-  const [selectedObject, setSelectedObjectRef] =
-    useState<THREE.Object3D | null>(null);
   const { scene } = useThree();
 
   useEffect(() => {
@@ -32,35 +33,31 @@ const SceneComponent: React.FC<SceneComponentProps> = ({ id, name }) => {
     return () => {
       console.log("SceneComponent will unmount");
     };
-  });
-
-  useEffect(() => {
-    if (selectedObjectId && objectRefs.current[selectedObjectId]) {
-      const obj = objectRefs.current[selectedObjectId];
-      if (obj && obj.parent) {
-        setSelectedObjectRef(obj);
-        console.log(`Selected object set: ${selectedObjectId}`);
-      } else {
-        console.log(
-          `Selected object not ready or not in scene: ${selectedObjectId}`
-        );
-      }
-    } else {
-      setSelectedObjectRef(null);
-      console.log(
-        `No object selected or object not found: ${selectedObjectId}`
-      );
-    }
-  }, [selectedObjectId, objects]);
+  }, []);
 
   useFrame(() => {
-    console.log("Frame rendered");
     Object.entries(objectRefs.current).forEach(([id, ref]) => {
       if (ref) {
         console.log(`Object ${id} position:`, ref.position);
       }
     });
   });
+
+  const handleTransformChange = (e) => {
+    if (selectedObjectId && objectRefs.current[selectedObjectId]) {
+      const obj = objectRefs.current[selectedObjectId];
+
+      // Update the object's transform properties
+      updateObject(selectedObjectId, {
+        position: obj.position.toArray(),
+        orientation: [obj.rotation.x, obj.rotation.y, obj.rotation.z],
+        scale: obj.scale.toArray(),
+      });
+
+      // Force update on the object ref to ensure it reflects the new transform
+      obj.updateMatrix();
+    }
+  };
 
   return (
     <group name={name}>
@@ -70,19 +67,24 @@ const SceneComponent: React.FC<SceneComponentProps> = ({ id, name }) => {
 
         const CommonProps = {
           key: obj.id,
-          onClick: (event: React.MouseEvent) => {
-            console.log(`Object clicked: id=${obj.id}`);
-            event.stopPropagation();
+          onClick: (e: React.MouseEvent) => {
+            e.stopPropagation();
             setSelectedObject(obj.id);
+          },
+          onPointerMissed: (e: React.MouseEvent) => {
+            if (e.type === "click") setSelectedObject(null);
+          },
+          onContextMenu: (e: React.MouseEvent) => {
+            if (selectedObjectId === obj.id) {
+              e.stopPropagation();
+              cycleTransformMode();
+            }
           },
           selected: isSelected,
           ref: (el: THREE.Object3D | null) => {
             console.log(`Setting ref for object: id=${obj.id}`);
             if (el) {
               objectRefs.current[obj.id] = el;
-              if (isSelected) {
-                setSelectedObjectRef(el);
-              }
             }
           },
         };
@@ -105,11 +107,15 @@ const SceneComponent: React.FC<SceneComponentProps> = ({ id, name }) => {
 
         return Component;
       })}
-      {selectedObject && (
-        <TransformControls object={selectedObject} mode="translate" />
+      {selectedObjectId && (
+        <TransformControls
+          object={objectRefs.current[selectedObjectId]}
+          mode={transformMode}
+          onObjectChange={handleTransformChange}
+        />
       )}
     </group>
   );
 };
 
-export default SceneComponent;
+export default React.memo(SceneComponent);
