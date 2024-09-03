@@ -9,6 +9,8 @@ import {
 interface SceneState {
   scenes: Scene[];
   objects: (Object | Robot | GeometricObject)[];
+  selectedObjectId: string | null;
+  transformMode: "translate" | "rotate" | "scale";
   addScene: (scene: Scene) => void;
   initializeScene: (
     sceneData: Scene,
@@ -25,15 +27,15 @@ interface SceneState {
   getObjectsBySceneId: (
     sceneId: string
   ) => (Object | Robot | GeometricObject)[];
-
-  selectedObjectId: string | null;
   setSelectedObject: (id: string | null) => void;
+  cycleTransformMode: () => void;
 }
 
 export const useSceneStore = create<SceneState>((set, get) => ({
   scenes: [],
   objects: [],
-  selectedObjectId: null, // Added this line
+  selectedObjectId: null,
+  transformMode: "translate",
 
   addScene: (scene) => set((state) => ({ scenes: [...state.scenes, scene] })),
   initializeScene: (sceneData, objectsData) =>
@@ -75,4 +77,14 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   },
 
   setSelectedObject: (id) => set({ selectedObjectId: id }),
+
+  cycleTransformMode: () =>
+    set((state) => ({
+      transformMode:
+        state.transformMode === "translate"
+          ? "rotate"
+          : state.transformMode === "rotate"
+            ? "scale"
+            : "translate",
+    })),
 }));
