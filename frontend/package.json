@@ -17,6 +17,8 @@
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@react-three/drei": "^9.112.0",
+    "@react-three/fiber": "^8.17.6",
     "@vectioneer/motorcortex-js": "^0.17.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -26,7 +28,7 @@
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.167.0",
+    "three": "^0.168.0",
     "urdf-loader": "^0.12.1",
     "xacro-parser": "^0.3.9"
   },
