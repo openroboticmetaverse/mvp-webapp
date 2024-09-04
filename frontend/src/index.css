@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+html, body, #root {
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  background: black;
   height: 100vh;
   width: 100vw;
+}
+
+body {
+  background: black;
 }
 @layer base {
   :root {
