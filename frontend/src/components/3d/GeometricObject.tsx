@@ -5,7 +5,7 @@ import {
   GeometricObject,
   PrimitiveType,
   GeometryParameters,
-} from "@/models/GerometricObject";
+} from "@/models/GeometricObject";
 
 interface GeometricObjectProps {
   id: number;
