@@ -1,11 +1,10 @@
-import Scene from "./components/3d/Scene.tsx";
-import TheViewer from "./TheViewer.tsx";
+import { SimpleScene } from "./components/3d/SimpleScene.tsx";
 import DefaultLayout from "@/components/default-layout.tsx";
 
 function App() {
   return (
     <div className="h-screen">
-      <Scene />;
+      <SimpleScene />
       <DefaultLayout />
     </div>
   );
