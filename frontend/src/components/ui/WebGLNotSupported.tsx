@@ -54,7 +54,7 @@ const WebGLNotSupported = () => {
             </a>
           </Button>
           <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/50 backdrop-blur-sm transition-all duration-300 text-lg">
-            <a href="mailto:support@openroboticmetaverse.org">Visit Website </a>
+            <a href="https://openroboticmetaverse.org">Visit Website </a>
           </Button>
         </CardFooter>
       </Card>
