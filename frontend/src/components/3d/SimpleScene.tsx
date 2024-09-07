@@ -4,6 +4,7 @@ import {
   GizmoViewport,
   Grid,
   OrbitControls,
+  SpotLight,
   StatsGl,
 } from "@react-three/drei";
 
@@ -16,24 +17,38 @@ const Scene: React.FC = () => {
   return (
     <>
       <ambientLight intensity={0.8} />
-      <pointLight position={[0, 10, 10]} />
+      <directionalLight
+        castShadow
+        position={[5, 5, 5]}
+        intensity={1.5}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-far={50}
+        shadow-camera-left={-10}
+        shadow-camera-right={10}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10}
+      />
+
       <PrimitiveShape
         shape="sphere"
         position={[-2, 0, 0]}
         sceneId="1"
         name="Sphere1"
+        color="orange"
       />
       <PrimitiveShape
         shape="cube"
         position={[0, 0, 0]}
         sceneId="1"
         name="Cube1"
+        color="lightgreen"
       />
       <PrimitiveShape
         shape="cylinder"
         position={[2, 0, 0]}
         sceneId="1"
         name="Cylinder1"
+        color="cyan"
       />
       <PropObject name="apple" type="apple" sceneId="1" position={[-4, 0, 0]} />
       <RobotObject
@@ -67,8 +82,12 @@ export const SimpleScene = () => {
     >
       <OrbitControls makeDefault />
       <Scene />
+      <mesh receiveShadow position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="gray" />
+      </mesh>
 
-      <Grid
+      {/*       <Grid
         args={[10, 100]}
         infiniteGrid
         fadeDistance={120}
@@ -78,14 +97,14 @@ export const SimpleScene = () => {
         cellSize={1}
         fadeStrength={2}
       />
-
+ */}
       <StatsGl />
-      <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
+      {/*       <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
         <GizmoViewport
           axisColors={["#9d4b4b", "#2f7f4f", "#3b5b9d"]}
           labelColor="white"
         />
-      </GizmoHelper>
+      </GizmoHelper> */}
     </Canvas>
   );
 };
