@@ -4,7 +4,6 @@ import {
   GizmoViewport,
   Grid,
   OrbitControls,
-  SpotLight,
   StatsGl,
 } from "@react-three/drei";
 
@@ -19,14 +18,9 @@ const Scene: React.FC = () => {
       <ambientLight intensity={0.8} />
       <directionalLight
         castShadow
-        position={[5, 5, 5]}
-        intensity={1.5}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
+        position={[5, 10, 5]}
+        intensity={2}
+        shadow-mapSize={[512, 512]}
       />
 
       <PrimitiveShape
@@ -50,6 +44,21 @@ const Scene: React.FC = () => {
         name="Cylinder1"
         color="cyan"
       />
+      <PrimitiveShape
+        shape="cone"
+        position={[5, 0, 0]}
+        sceneId="1"
+        name="Cone1"
+        color="pink"
+      />
+      <PrimitiveShape
+        shape="torus"
+        position={[8, 0, 0]}
+        sceneId="1"
+        name="Torus1"
+        color="purple"
+      />
+
       <PropObject name="apple" type="apple" sceneId="1" position={[-4, 0, 0]} />
       <RobotObject
         type="panda"
@@ -82,12 +91,12 @@ export const SimpleScene = () => {
     >
       <OrbitControls makeDefault />
       <Scene />
-      <mesh receiveShadow position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/*    <mesh receiveShadow position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[100, 100]} />
         <meshStandardMaterial color="gray" />
-      </mesh>
+      </mesh> */}
 
-      {/*       <Grid
+      <Grid
         args={[10, 100]}
         infiniteGrid
         fadeDistance={120}
@@ -97,14 +106,14 @@ export const SimpleScene = () => {
         cellSize={1}
         fadeStrength={2}
       />
- */}
+
       <StatsGl />
-      {/*       <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
+      <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
         <GizmoViewport
           axisColors={["#9d4b4b", "#2f7f4f", "#3b5b9d"]}
           labelColor="white"
         />
-      </GizmoHelper> */}
+      </GizmoHelper>
     </Canvas>
   );
 };
