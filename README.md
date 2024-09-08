@@ -17,7 +17,8 @@
 
 This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse, that brings robotic projects in one place. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
 
-![image](https://github.com/user-attachments/assets/26531ac3-e93b-4ad2-9bd1-1c82543c13a0)
+![image](https://github.com/user-attachments/assets/b0002372-f65a-4d02-8b5a-93d587aae90f)
+
 
 
 ## Key Features 🗝️
@@ -42,10 +43,6 @@ git clone https://github.com/openroboticmetaverse/mvp-webapp.git
 
 ```bash
 cd mvp-webapp
-```
-
-```bash
-git switch migrate-react
 ```
 
 2. Docker Compose 🐳
