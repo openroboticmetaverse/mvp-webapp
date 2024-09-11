@@ -1,21 +1,21 @@
-import useModelStore from "@/stores/model-store";
+/* import useModelStore from "@/stores/model-store";
 import { useCallback } from "react";
-
+ */
 const DeleteRobot = () => {
-  const { sceneModels, setModelToRemove } = useModelStore();
-
-  const handleDeleteModel = useCallback(
+  /*   const { sceneModels, setModelToRemove } = useModelStore();
+   */
+  /*   const handleDeleteModel = useCallback(
     (model: ModelInfo) => {
       console.log("Triggering deletion for model:", model);
       setModelToRemove(model);
     },
     [setModelToRemove]
-  );
+  ); */
 
   return (
     <div className="flex flex-col gap-5">
       <h3>Models in the Scene: </h3>
-      <div className="flex flex-wrap gap-3">
+      {/*       <div className="flex flex-wrap gap-3">
         {sceneModels.length === 0 ? (
           <p>No models in the scene</p>
         ) : (
@@ -30,7 +30,7 @@ const DeleteRobot = () => {
             </div>
           ))
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
