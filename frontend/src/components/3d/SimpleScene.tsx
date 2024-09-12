@@ -9,7 +9,7 @@ import {
 
 import WebGLNotSupported from "../ui/WebGLNotSupported";
 import PrimitiveShape from "./PrimitiveShape";
-import PropObject from "./PropObject";
+
 import RobotObject from "./RobotObject";
 
 const Scene: React.FC = () => {
@@ -59,7 +59,7 @@ const Scene: React.FC = () => {
         color="purple"
       />
 
-      <PropObject name="apple" type="apple" sceneId="1" position={[-4, 0, 0]} />
+      {/* <PropObject name="apple" type="apple" sceneId="1" position={[-4, 0, 0]} /> */}
       <RobotObject
         type="panda"
         sceneId="1"
