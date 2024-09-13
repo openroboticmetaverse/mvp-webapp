@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import {
   GizmoHelper,
   GizmoViewport,
@@ -16,101 +16,42 @@ interface FrankaSceneProps {
   websocketUrl: string;
 }
 
-const WebGLContextHandler: React.FC = () => {
-  const { gl } = useThree();
-
-  useEffect(() => {
-    const handleContextLost = (event: WebGLContextEvent) => {
-      event.preventDefault();
-      console.log("WebGL context lost. Attempting to restore...");
-    };
-
-    const handleContextRestored = () => {
-      console.log("WebGL context restored.");
-    };
-
-    gl.domElement.addEventListener(
-      "webglcontextlost",
-      handleContextLost,
-      false
-    );
-    gl.domElement.addEventListener(
-      "webglcontextrestored",
-      handleContextRestored,
-      false
-    );
-
-    return () => {
-      gl.domElement.removeEventListener("webglcontextlost", handleContextLost);
-      gl.domElement.removeEventListener(
-        "webglcontextrestored",
-        handleContextRestored
-      );
-    };
-  }, [gl]);
-
-  return null;
-};
-
 const FrankaScene: React.FC<FrankaSceneProps> = ({ websocketUrl }) => {
   const [jointAngles, setJointAngles] = useState<{ [key: string]: number }>({});
   const [wsStatus, setWsStatus] = useState<
-    "connecting" | "connected" | "disconnected"
-  >("disconnected");
+    "connecting" | "Connected" | "Disconnected"
+  >("Disconnected");
   const [error, setError] = useState<string | null>(null);
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
 
-  const checkNetworkConnectivity = useCallback(async () => {
-    try {
-      const response = await fetch("https://www.google.com", {
-        mode: "no-cors",
-      });
-      return response.type === "opaque";
-    } catch {
-      return false;
-    }
-  }, []);
+  console.log("FrankaScene websocketUrl", websocketUrl);
 
-  const connectWebSocket = useCallback(async () => {
-    if (reconnectAttempts.current >= maxReconnectAttempts) {
-      const errorMsg =
-        "[FrankaScene] Max reconnection attempts reached. Please try again later.";
-      console.log(errorMsg);
-      setError(errorMsg);
-      setWsStatus("disconnected");
+  const connectWebSocket = useCallback(() => {
+    if (!websocketUrl) {
+      console.error("WebSocket URL is not provided");
+      setError("WebSocket URL is missing");
+      setWsStatus("Disconnected");
       return;
     }
 
-    const isOnline = await checkNetworkConnectivity();
-    if (!isOnline) {
+    if (reconnectAttempts.current >= maxReconnectAttempts) {
       const errorMsg =
-        "[FrankaScene] No internet connection detected. Please check your network.";
+        "Max reconnection attempts reached. Please try again later.";
       console.log(errorMsg);
       setError(errorMsg);
-      setWsStatus("disconnected");
+      setWsStatus("Disconnected");
       return;
     }
 
     setWsStatus("connecting");
-    console.log(
-      `[FrankaScene] Attempting to connect to WebSocket at ${websocketUrl}`
-    );
+    console.log(`Attempting to connect to WebSocket at ${websocketUrl}`);
 
-    let socket: WebSocket;
-    try {
-      socket = new WebSocket(websocketUrl);
-    } catch (err) {
-      const errorMsg = `[FrankaScene] Error creating WebSocket: ${err}`;
-      console.error(errorMsg);
-      setError(errorMsg);
-      setWsStatus("disconnected");
-      return;
-    }
+    const socket = new WebSocket(websocketUrl);
 
     socket.onopen = () => {
-      console.log("[FrankaScene] WebSocket connection established");
-      setWsStatus("connected");
+      console.log("WebSocket connection established");
+      setWsStatus("Connected");
       setError(null);
       reconnectAttempts.current = 0;
     };
@@ -122,38 +63,36 @@ const FrankaScene: React.FC<FrankaSceneProps> = ({ websocketUrl }) => {
           setJointAngles(jointData.jointPositions);
         }
       } catch (error) {
-        console.error("[FrankaScene] Error parsing message:", error);
+        console.error("Error parsing message:", error);
       }
     };
 
     socket.onerror = (error) => {
-      const errorMsg = `[FrankaScene] WebSocket error: ${error}`;
+      const errorMsg = `WebSocket error: ${error}`;
       console.error(errorMsg);
       setError(errorMsg);
-      setWsStatus("disconnected");
+      setWsStatus("Disconnected");
     };
 
     socket.onclose = (event) => {
       console.log(
-        `[FrankaScene] WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`
+        `WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`
       );
-      setWsStatus("disconnected");
+      setWsStatus("Disconnected");
 
       if (event.code === 1006) {
         reconnectAttempts.current++;
         const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000);
-        console.log(
-          `[FrankaScene] Attempting to reconnect in ${delay / 1000} seconds...`
-        );
+        console.log(`Attempting to reconnect in ${delay / 1000} seconds...`);
         setTimeout(connectWebSocket, delay);
       }
     };
 
     return () => {
-      console.log("[FrankaScene] Closing WebSocket connection");
+      console.log("Closing WebSocket connection");
       socket.close();
     };
-  }, [websocketUrl, checkNetworkConnectivity]);
+  }, [websocketUrl]);
 
   useEffect(() => {
     const cleanup = connectWebSocket();
@@ -172,10 +111,17 @@ const FrankaScene: React.FC<FrankaSceneProps> = ({ websocketUrl }) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0 z-10 p-2 bg-black bg-opacity-50 text-white">
-        <div>WebSocket Status: {wsStatus}</div>
+      <div className="absolute top-0 right-0 z-10 p-2 bg-black bg-opacity-50 text-white rounded-sm">
+        <div>
+          MoJuCo Status:{" "}
+          <span
+            className={wsStatus === "Connected" ? "text-green-500" : undefined}
+          >
+            {wsStatus}
+          </span>
+        </div>
         {error && <div className="text-red-500">{error}</div>}
-        {wsStatus === "disconnected" && (
+        {wsStatus === "Disconnected" && (
           <button
             onClick={handleManualReconnect}
             className="mt-2 px-2 py-1 bg-blue-500 rounded"
@@ -191,7 +137,6 @@ const FrankaScene: React.FC<FrankaSceneProps> = ({ websocketUrl }) => {
         dpr={[0.8, 2]}
         fallback={<WebGLNotSupported />}
       >
-        <WebGLContextHandler />
         <OrbitControls makeDefault />
         <ambientLight intensity={0.8} />
         <directionalLight

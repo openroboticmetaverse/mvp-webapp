@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DefaultLayout from "@/components/default-layout";
 import { SimpleScene } from "@/components/3d/SimpleScene";
 import FrankaScene from "@/components/3d/FrankaScene";
@@ -17,7 +17,9 @@ function App() {
   const [currentScene, setCurrentScene] = useState<"simple" | "franka">(
     "simple"
   );
-  const [websocketUrl, setWebsocketUrl] = useState<string>("");
+  const [websocketUrl, setWebsocketUrl] = useState<string>(
+    "ws://localhost:8081"
+  );
   const [showDialog, setShowDialog] = useState(false);
 
   const handleOpenedWindow = (windowName: string) => {
@@ -31,14 +33,22 @@ function App() {
   };
 
   const handleStartSimulation = () => {
-    setCurrentScene("franka");
-    setShowDialog(false);
+    if (websocketUrl) {
+      console.log("Starting simulation with WebSocket URL:", websocketUrl);
+      setCurrentScene("franka");
+      setShowDialog(false);
+    } else {
+      console.error("WebSocket URL is empty. Cannot start simulation.");
+    }
   };
 
   const handleDialogClose = () => {
     setShowDialog(false);
-    setWebsocketUrl("");
   };
+
+  useEffect(() => {
+    console.log("Current WebSocket URL:", websocketUrl);
+  }, [websocketUrl]);
 
   return (
     <div className="h-screen">
@@ -57,7 +67,7 @@ function App() {
           <Input
             value={websocketUrl}
             onChange={(e) => setWebsocketUrl(e.target.value)}
-            placeholder="ws://localhost:8080"
+            placeholder="ws://localhost:8081"
           />
           <DialogFooter>
             <Button onClick={handleDialogClose}>Cancel</Button>
