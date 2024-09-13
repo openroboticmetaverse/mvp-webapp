@@ -11,6 +11,7 @@ interface RobotObjectProps {
   type: string;
   sceneId: string;
   position: [number, number, number];
+  websocketUrl?: string;
 }
 
 const RobotObject: React.FC<RobotObjectProps> = ({
@@ -18,6 +19,7 @@ const RobotObject: React.FC<RobotObjectProps> = ({
   type,
   sceneId,
   position,
+  websocketUrl,
 }) => {
   const [robotUrl, setRobotUrl] = useState<string | null>(null);
   const robotRef = useRef<Object3D | null>(null);
@@ -72,11 +74,6 @@ const RobotObject: React.FC<RobotObjectProps> = ({
             const robot = urdfLoader.parse(xml);
             robot.rotation.set(-Math.PI / 2, 0, 0);
             robot.scale.set(2, 2, 2);
-            robot.setJointValue("panda_joint6", -1.04);
-            robot.setJointValue("panda_joint2", 2.04);
-            robot.setJointValue("panda_joint4", 1.04);
-            robot.setJointValue("panda_joint3", 3.04);
-            robot.setJointValue("panda_joint5", -1.04);
             robotRef.current = robot;
             setIsLoading(false);
           },
@@ -99,6 +96,31 @@ const RobotObject: React.FC<RobotObjectProps> = ({
       }
     };
   }, [robotUrl, scene]);
+
+  useEffect(() => {
+    if (!robotRef.current || !websocketUrl) return;
+
+    const socket = new WebSocket(websocketUrl);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      const jointData = JSON.parse(event.data);
+      Object.entries(jointData).forEach(([jointName, jointValue]) => {
+        robotRef.current?.setJointValue(jointName, jointValue as number);
+      });
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [websocketUrl]);
 
   if (!robotUrl) {
     console.warn(`No robot model found for type: ${type}`);
