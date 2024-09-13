@@ -1,50 +1,23 @@
-import { useState } from "react";
-import MainNav from "@/components/main-nav.tsx";
-import Window from "@/components/window.tsx";
-import FrankaScene from "@/components/3d/FrankaScene";
-import { SimpleScene } from "@/components/3d/SimpleScene";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import MainNav from "@/components/main-nav";
+import Window from "@/components/window";
 
-const DefaultLayout = () => {
-  const [openedWindow, setOpenedWindow] = useState<string | null>(null);
-  const [currentScene, setCurrentScene] = useState<"simple" | "franka">(
-    "simple"
-  );
-  const [websocketUrl, setWebsocketUrl] = useState<string>("");
-  const [showDialog, setShowDialog] = useState(false);
+interface DefaultLayoutProps {
+  openedWindow: string | null;
+  onButtonClick: (windowName: string) => void;
+  onPlaySimulation: () => void;
+}
 
-  const handleOpenedWindow = (windowName: string) => {
-    if (windowName === "start") {
-      setShowDialog(true);
-    } else {
-      setOpenedWindow(windowName === openedWindow ? null : windowName);
-    }
-  };
-
-  const handleStartSimulation = () => {
-    setCurrentScene("franka");
-    setShowDialog(false);
-  };
-
-  const handleDialogClose = () => {
-    setShowDialog(false);
-    setWebsocketUrl("");
-  };
-
+const DefaultLayout: React.FC<DefaultLayoutProps> = ({
+  openedWindow,
+  onButtonClick,
+  onPlaySimulation,
+}) => {
   return (
-    <div>
-      <div className="absolute top-2 right-5 text-white"> mvp v0.4</div>
+    <div className="">
+      <div className="absolute top-2 right-5 text-white "> mvp v0.4</div>
       <MainNav
-        onButtonClick={handleOpenedWindow}
-        onPlaySimulation={handleStartSimulation}
+        onButtonClick={onButtonClick}
+        onPlaySimulation={onPlaySimulation}
       />
       <Window position="right" windowTag={openedWindow} />
       <div className="absolute bottom-4 left-7 text-white">
@@ -56,26 +29,6 @@ const DefaultLayout = () => {
           />
         </a>
       </div>
-
-      {currentScene === "simple" && <SimpleScene />}
-      {currentScene === "franka" && <FrankaScene websocketUrl={websocketUrl} />}
-
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Enter WebSocket URL</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={websocketUrl}
-            onChange={(e) => setWebsocketUrl(e.target.value)}
-            placeholder="ws://localhost:8080"
-          />
-          <DialogFooter>
-            <Button onClick={handleDialogClose}>Cancel</Button>
-            <Button onClick={handleStartSimulation}>Start Simulation</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
