@@ -23,6 +23,8 @@ function App() {
   const handleOpenedWindow = (windowName: string) => {
     if (windowName === "start") {
       setShowDialog(true);
+    } else if (windowName === "stop") {
+      setCurrentScene("simple");
     } else {
       setOpenedWindow(windowName === openedWindow ? null : windowName);
     }

@@ -30,7 +30,7 @@ const PrimitiveShape: React.FC<PrimitiveShapeProps> = ({
       case "sphere":
         return <Sphere args={[1, 32, 32]} {...sharedProps} />;
       case "cube":
-        return <Box args={[1, 1, 1]} {...sharedProps} />;
+        return <Box args={[0.2, 0.2, 0.2]} {...sharedProps} />;
       case "cylinder":
         return <Cylinder args={[1, 1, 2, 32]} {...sharedProps} />;
       case "cone":

@@ -9,8 +9,11 @@ services:
     volumes:
       - ./frontend/:/var/www/html/app
     tty: true
-#    networks:
-#      - tdsi-network
+    networks:
+      - tdsi-network
+networks:
+  tdsi-network:
+    external: true
 #networks:
 #  tdsi-network:
 #    external: true
