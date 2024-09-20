@@ -19,7 +19,6 @@ This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision
 
 ![image](https://github.com/user-attachments/assets/26531ac3-e93b-4ad2-9bd1-1c82543c13a0)
 
-
 ## Key Features 🗝️
 
 - **Interactive Robotic Control**: Users can directly interact with robots in a virtual space. 🕹️
@@ -45,7 +44,7 @@ cd mvp-webapp
 ```
 
 ```bash
-git switch migrate-react
+git switch three-fiber/build-fix
 ```
 
 2. Docker Compose 🐳
