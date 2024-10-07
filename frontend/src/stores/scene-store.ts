@@ -1,11 +1,24 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { SceneData, ObjectData, RobotData } from "@/api/sceneService";
-import { fetchSceneData, saveSceneData } from "../api/sceneService"; // Assuming these API functions exist
+import {
+  SceneData,
+  ObjectData,
+  RobotData,
+  fetchSceneData,
+  saveSceneData,
+} from "../api/sceneService";
 
+/**
+ * SceneStore manages the state and operations for a scene in the application.
+ * It handles loading, updating, and saving scene data, as well as managing the selected object/robot.
+ */
 class SceneStore {
+  /** The current scene data */
   sceneData: SceneData | null = null;
+  /** The ID of the currently selected object or robot */
   selectedId: string | null = null;
+  /** Indicates whether a data operation is in progress */
   isLoading: boolean = false;
+  /** Stores any error messages from failed operations */
   error: string | null = null;
 
   constructor() {
@@ -13,6 +26,10 @@ class SceneStore {
     makeAutoObservable(this);
   }
 
+  /**
+   * Fetches scene data from the server.
+   * @param {string} sceneId - The ID of the scene to fetch.
+   */
   async fetchScene(sceneId: string) {
     console.log(`Fetching scene with ID: ${sceneId}`);
     this.isLoading = true;
@@ -27,17 +44,28 @@ class SceneStore {
     } catch (error) {
       console.error("Error fetching scene data", error);
       runInAction(() => {
-        this.error = error.message;
+        if (error instanceof Error) {
+          console.log(error.message);
+        }
         this.isLoading = false;
       });
     }
   }
 
+  /**
+   * Sets the ID of the currently selected object or robot.
+   * @param {string | null} id - The ID to set as selected, or null to clear selection.
+   */
   setSelectedId = (id: string | null) => {
     console.log(`Setting selected ID: ${id}`);
     this.selectedId = id;
   };
 
+  /**
+   * Updates an object in the scene.
+   * @param {string} id - The ID of the object to update.
+   * @param {Partial<ObjectData>} updates - The properties to update on the object.
+   */
   updateObject(id: string, updates: Partial<ObjectData>) {
     console.log(`Updating object with ID: ${id}`, updates);
     if (!this.sceneData) {
@@ -61,6 +89,11 @@ class SceneStore {
     }
   }
 
+  /**
+   * Updates a robot in the scene.
+   * @param {string} id - The ID of the robot to update.
+   * @param {Partial<RobotData>} updates - The properties to update on the robot.
+   */
   updateRobot(id: string, updates: Partial<RobotData>) {
     console.log(`Updating robot with ID: ${id}`, updates);
     if (!this.sceneData) {
@@ -84,6 +117,9 @@ class SceneStore {
     }
   }
 
+  /**
+   * Saves the current scene data to the server.
+   */
   async saveScene() {
     console.log("Saving scene data");
     if (!this.sceneData) {
@@ -93,18 +129,32 @@ class SceneStore {
     this.isLoading = true;
     this.error = null;
     try {
-      await saveSceneData(this.sceneData);
+      const sceneDataToSave = { ...this.sceneData };
+      const savedData = await saveSceneData(sceneDataToSave);
       console.log("Scene data saved successfully");
       runInAction(() => {
+        this.sceneData = savedData;
         this.isLoading = false;
       });
     } catch (error) {
       console.error("Error saving scene data", error);
       runInAction(() => {
-        this.error = error.message;
+        if (error instanceof Error) {
+          this.error = error.message;
+        } else {
+          this.error = String(error);
+        }
         this.isLoading = false;
       });
     }
+  }
+
+  addObject(newObject: ObjectData) {
+    this.sceneData!.objects.push(newObject);
+  }
+
+  addRobot(newRobot: RobotData) {
+    this.sceneData!.robots.push(newRobot);
   }
 }
 

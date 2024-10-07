@@ -10,16 +10,10 @@ import {
 } from "@react-three/drei";
 import { Object3D } from "three";
 import { observer } from "mobx-react";
-import {
-  fetchSceneData,
-  RobotData,
-  ObjectData,
-  SceneData,
-} from "../../api/sceneService";
+import { RobotData, ObjectData } from "../../api/sceneService";
 import { renderObject } from "./renderObject";
 import { renderRobot } from "./renderRobot";
 import LoadingScreen from "../ui/LoadingScreen";
-import { saveScene } from "@/api/mockAPIService";
 import WebGLNotSupported from "../ui/WebGLNotSupported";
 import { sceneStore } from "@/stores/scene-store";
 

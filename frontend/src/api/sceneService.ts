@@ -42,7 +42,7 @@ export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
     updated_at: new Date().toISOString(),
     objects: [
       {
-        id: "obj1",
+        id: "001",
         name: "Object 1",
         description: "This is object 1",
         position: [0, 0, 0],
@@ -52,7 +52,7 @@ export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
         objectReference: "ref1",
       },
       {
-        id: "obj2",
+        id: "002",
         name: "Object 2",
         description: "This is object 2",
         position: [4, 0, 0],
@@ -64,7 +64,7 @@ export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
     ],
     robots: [
       {
-        id: "robot1",
+        id: "003",
         name: "Robot 1",
         description: "This is robot 1",
         position: [2, 0, 0],
@@ -97,7 +97,7 @@ export const saveSceneData = async (
   };
 
   // Log the saved scene data
-  console.log("Saved scene data:", JSON.stringify(sceneData, null, 2));
+  console.log("Saved scene data:", JSON.stringify(updatedScene, null, 2));
 
   // Simulate potential errors
   /*   if (Math.random() < 0.1) {
