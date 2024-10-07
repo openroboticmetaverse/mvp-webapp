@@ -1,11 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import {
-  SceneData,
-  ObjectData,
-  RobotData,
-  fetchSceneData,
-  saveSceneData,
-} from "../api/sceneService";
+import { fetchSceneData, saveSceneData } from "../api/sceneService";
+import { SceneData, RobotData, ObjectData } from "../types/Interfaces";
 
 /**
  * SceneStore manages the state and operations for a scene in the application.

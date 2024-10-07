@@ -1,4 +1,4 @@
-import { RobotData } from "../../api/sceneService";
+import { RobotData } from "@/types/Interfaces";
 
 /**
  * Renders a 3D representation of a robot. The placeholder mesh is a box with the given color,

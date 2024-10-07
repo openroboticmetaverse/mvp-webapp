@@ -10,7 +10,7 @@ import {
 } from "@react-three/drei";
 import { Object3D } from "three";
 import { observer } from "mobx-react";
-import { RobotData, ObjectData } from "../../api/sceneService";
+import { RobotData, ObjectData } from "@/types/Interfaces";
 import { renderObject } from "./renderObject";
 import { renderRobot } from "./renderRobot";
 import LoadingScreen from "../ui/LoadingScreen";

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Bot, Box, Cylinder, Globe, Goal, Square, Torus } from "lucide-react";
 import { sceneStore } from "@/stores/scene-store";
-import { ObjectData, RobotData } from "@/api/sceneService";
+import { ObjectData, RobotData } from "@/types/Interfaces";
 
 interface ModelInfo {
   name: string;

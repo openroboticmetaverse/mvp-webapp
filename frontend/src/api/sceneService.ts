@@ -1,36 +1,4 @@
-export interface SceneData {
-  id: string;
-  name: string;
-  description: string;
-  objects: ObjectData[];
-  robots: RobotData[];
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ObjectData {
-  id: string;
-  name: string;
-  description: string;
-  position: [number, number, number];
-  orientation: [number, number, number];
-  scale: [number, number, number];
-  color: string;
-  objectReference: string;
-}
-
-export interface RobotData {
-  id: string;
-  name: string;
-  description: string;
-  position: [number, number, number];
-  orientation: [number, number, number];
-  scale: [number, number, number];
-  jointAngles: number[];
-  robotReference: string;
-}
-
+import { SceneData } from "../types/Interfaces";
 export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
   // Simulated fake data
   const fakeData: SceneData = {
