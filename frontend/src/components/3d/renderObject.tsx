@@ -10,10 +10,15 @@ import { ObjectData } from "../../api/sceneService";
  */
 export const renderObject = (
   obj: ObjectData,
-  setSelectedId: (id: string) => void
+  setSelectedId: (id: string | null) => void
 ) => {
   return (
-    <mesh onClick={() => setSelectedId(obj.id)}>
+    <mesh
+      onClick={(event) => {
+        event.stopPropagation();
+        setSelectedId(obj.id);
+      }}
+    >
       <boxGeometry args={[1, 1, 1]} />
       <meshMatcapMaterial color={obj.color} />
     </mesh>

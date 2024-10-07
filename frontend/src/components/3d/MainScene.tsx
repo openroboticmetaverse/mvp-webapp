@@ -9,43 +9,38 @@ import {
   TransformControls,
 } from "@react-three/drei";
 import { Object3D } from "three";
-import { fetchSceneData, SceneData } from "../../api/sceneService";
+import { observer } from "mobx-react";
+import { fetchSceneData, RobotData, SceneData } from "../../api/sceneService";
 import { renderObject } from "./renderObject";
 import { renderRobot } from "./renderRobot";
 import LoadingScreen from "../ui/LoadingScreen";
-import { saveScene } from "@/api/mockAPIService";
+import { ObjectData, saveScene } from "@/api/mockAPIService";
 import WebGLNotSupported from "../ui/WebGLNotSupported";
+import { sceneStore } from "@/stores/scene-store";
 
 interface MainSceneProps {
   sceneId: string;
 }
 
-const MainScene: React.FC<MainSceneProps> = ({ sceneId }) => {
-  const [sceneData, setSceneData] = useState<SceneData | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
+const MainScene: React.FC<MainSceneProps> = observer(({ sceneId }) => {
   useEffect(() => {
-    const loadSceneData = async () => {
-      const data = await fetchSceneData(sceneId);
-      setSceneData(data);
-    };
-
-    loadSceneData();
+    sceneStore.fetchScene(sceneId);
   }, [sceneId]);
 
   const handleSaveScene = async () => {
-    if (!sceneData) return;
-
-    try {
-      await saveScene(sceneData.objects);
-      console.log("Scene saved successfully");
-    } catch (error) {
-      console.error("Error saving scene:", error);
-    }
+    await sceneStore.saveScene();
   };
 
-  if (!sceneData) {
+  if (sceneStore.isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (sceneStore.error) {
+    return <div>Error: {sceneStore.error}</div>;
+  }
+
+  if (!sceneStore.sceneData) {
+    return <div>No scene data available</div>;
   }
 
   return (
@@ -54,18 +49,10 @@ const MainScene: React.FC<MainSceneProps> = ({ sceneId }) => {
         camera={{ position: [20, 7, 12], fov: 60, near: 0.1, far: 200 }}
         style={{ background: "#242625" }}
         className="m-0 w-full h-full absolute"
-        dpr={[0.8, 2]} // Change Device Pixel Ratio for performance: lower is better
-        fallback={
-          <>
-            <WebGLNotSupported />
-          </>
-        }
+        dpr={[0.8, 2]}
+        fallback={<WebGLNotSupported />}
       >
-        <SceneContent
-          sceneData={sceneData}
-          selectedId={selectedId}
-          setSelectedId={setSelectedId}
-        />
+        <SceneContent />
       </Canvas>
 
       <button
@@ -76,19 +63,14 @@ const MainScene: React.FC<MainSceneProps> = ({ sceneId }) => {
       </button>
     </div>
   );
-};
+});
 
 // Separate component for scene content to use hooks
-const SceneContent: React.FC<{
-  sceneData: SceneData;
-  selectedId: string | null;
-  setSelectedId: (id: string | null) => void;
-}> = ({ sceneData, selectedId, setSelectedId }) => {
+const SceneContent: React.FC = observer(() => {
   const { scene } = useThree();
   const objectsRef = useRef<{ [key: string]: Object3D }>({});
 
   useEffect(() => {
-    // Clean up objects when component unmounts
     return () => {
       Object.values(objectsRef.current).forEach((obj) => {
         scene.remove(obj);
@@ -99,8 +81,15 @@ const SceneContent: React.FC<{
   const handleObjectChange = (event: any) => {
     const target = event.target.object;
     console.log("Object transformed:", target);
-    // Update your scene data here based on the new transform
+    const id = target.userData.id;
+    sceneStore.updateObject(id, {
+      position: target.position.toArray(),
+      orientation: target.rotation.toArray(),
+      scale: target.scale.toArray(),
+    });
   };
+
+  if (!sceneStore.sceneData) return null;
 
   return (
     <>
@@ -126,39 +115,40 @@ const SceneContent: React.FC<{
         />
       </GizmoHelper>
 
-      {sceneData.objects.map((obj) => (
+      {sceneStore.sceneData.objects.map((obj) => (
         <ObjectWrapper
           key={obj.id}
           obj={obj}
-          setSelectedId={setSelectedId}
+          setSelectedId={sceneStore.setSelectedId}
           objectsRef={objectsRef}
         />
       ))}
 
-      {sceneData.robots.map((robot) => (
+      {sceneStore.sceneData.robots.map((robot) => (
         <RobotWrapper
           key={robot.id}
           robot={robot}
-          setSelectedId={setSelectedId}
+          setSelectedId={sceneStore.setSelectedId}
           objectsRef={objectsRef}
         />
       ))}
 
-      {selectedId && objectsRef.current[selectedId] && (
+      {sceneStore.selectedId && objectsRef.current[sceneStore.selectedId] && (
         <TransformControls
-          object={objectsRef.current[selectedId]}
+          object={objectsRef.current[sceneStore.selectedId]}
           onObjectChange={handleObjectChange}
+          size={0.7}
         />
       )}
     </>
   );
-};
+});
 
 const ObjectWrapper: React.FC<{
-  obj: ObjectData; // Use the proper type
+  obj: ObjectData;
   setSelectedId: (id: string | null) => void;
   objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
-}> = ({ obj, setSelectedId, objectsRef }) => {
+}> = observer(({ obj, setSelectedId, objectsRef }) => {
   const { scene } = useThree();
   const [isReady, setIsReady] = useState(false);
 
@@ -192,13 +182,13 @@ const ObjectWrapper: React.FC<{
       {renderObject(obj, setSelectedId)}
     </primitive>
   );
-};
+});
 
 const RobotWrapper: React.FC<{
-  robot: RobotData; // Use the proper type
+  robot: RobotData;
   setSelectedId: (id: string | null) => void;
   objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
-}> = ({ robot, setSelectedId, objectsRef }) => {
+}> = observer(({ robot, setSelectedId, objectsRef }) => {
   const { scene } = useThree();
   const [isReady, setIsReady] = useState(false);
 
@@ -236,6 +226,6 @@ const RobotWrapper: React.FC<{
       {renderRobot(robot, setSelectedId)}
     </primitive>
   );
-};
+});
 
 export default MainScene;

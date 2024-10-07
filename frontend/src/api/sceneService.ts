@@ -4,6 +4,9 @@ export interface SceneData {
   description: string;
   objects: ObjectData[];
   robots: RobotData[];
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ObjectData {
@@ -34,6 +37,9 @@ export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
     id: "1",
     name: "Sample Scene",
     description: "This is a sample scene with objects and robots.",
+    user_id: "Karim",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
     objects: [
       {
         id: "obj1",
@@ -70,5 +76,36 @@ export const fetchSceneData = async (sceneId: string): Promise<SceneData> => {
     ],
   };
 
+  /*   if (Math.random() < 0.1) {
+    // 10% chance of error
+    throw new Error("Failed to fetch scene data");
+  } */
+
   return new Promise((resolve) => setTimeout(() => resolve(fakeData), 2000));
+};
+
+export const saveSceneData = async (
+  sceneData: SceneData
+): Promise<SceneData> => {
+  // Simulating an API call delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Update the updated_at timestamp
+  const updatedScene: SceneData = {
+    ...sceneData,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Log the saved scene data
+  console.log("Saved scene data:", JSON.stringify(sceneData, null, 2));
+
+  // Simulate potential errors
+  /*   if (Math.random() < 0.1) {
+    // 10% chance of error
+    throw new Error("Failed to save scene data");
+  } */
+
+  // In a real implementation, you would send this data to your backend
+  // For now, we'll just resolve the promise to simulate a successful save
+  return updatedScene;
 };

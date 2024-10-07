@@ -11,10 +11,15 @@ import { RobotData } from "../../api/sceneService";
  */
 export const renderRobot = (
   robot: RobotData,
-  setSelectedId: (id: string) => void
+  setSelectedId: (id: string | null) => void
 ) => {
   return (
-    <mesh onClick={() => setSelectedId(robot.id)}>
+    <mesh
+      onClick={(event) => {
+        event.stopPropagation();
+        setSelectedId(robot.id);
+      }}
+    >
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="gray" />
     </mesh>
