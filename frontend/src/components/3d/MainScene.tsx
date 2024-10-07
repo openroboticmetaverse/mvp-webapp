@@ -21,32 +21,29 @@ interface MainSceneProps {
   sceneId: string;
 }
 
-// Main component for the 3D scene
 const MainScene: React.FC<MainSceneProps> = observer(({ sceneId }) => {
-  // Fetch scene data when the component mounts or sceneId changes
   useEffect(() => {
+    console.log("Fetching scene data...");
     sceneStore.fetchScene(sceneId);
   }, [sceneId]);
 
-  // Handler for saving the scene
-  const handleSaveScene = async () => {
-    await sceneStore.saveScene();
-  };
+  useEffect(() => {
+    console.log("Scene data:", sceneStore.sceneData);
+    console.log("Objects:", sceneStore.objects);
+    console.log("Robots:", sceneStore.robots);
+  }, [sceneStore.sceneData, sceneStore.objects, sceneStore.robots]);
 
-  // Render loading screen while data is being fetched
   if (sceneStore.isLoading) {
     return <LoadingScreen />;
   }
 
-  // Render error message if there's an error
   if (sceneStore.error) {
     return <div>Error: {sceneStore.error}</div>;
   }
 
-  // Render message if no scene data is available
-  if (!sceneStore.sceneData) {
-    return <div>No scene data available</div>;
-  }
+  const handleSaveScene = async () => {
+    await sceneStore.saveScene();
+  };
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>

@@ -1,6 +1,7 @@
 import { useState, useEffect, ReactElement } from "react";
 import ModelBrowser from "@/components/windows/ModelBrowser";
 import DeleteRobot from "@/components/windows/delete-robot";
+import SceneSelector from "./windows/scene-selector";
 
 interface WindowProps {
   position: "left" | "right";
@@ -20,6 +21,9 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
         break;
       case "delete":
         setContent(<DeleteRobot />);
+        break;
+      case "scene-selector":
+        setContent(<SceneSelector />);
         break;
       default:
         setContent(null);

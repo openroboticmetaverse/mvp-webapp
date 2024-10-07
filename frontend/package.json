@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@radix-ui/react-context-menu": "^2.2.1",
+    "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-hover-card": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -22,6 +23,7 @@
     "@vectioneer/motorcortex-js": "^0.17.9",
     "add": "^2.0.6",
     "alert": "^6.0.2",
+    "axios": "^1.7.7",
     "card": "^2.5.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

@@ -2,7 +2,7 @@ import { CalendarDays } from "lucide-react";
 
 interface WindowCardProps {
   title: string;
-  description: string;
+  description: React.ReactNode;
   lastUpdated?: string;
 }
 const WindowCard = ({ title, description, lastUpdated }: WindowCardProps) => {

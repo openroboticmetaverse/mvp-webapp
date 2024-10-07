@@ -1,17 +1,15 @@
-import MainScene from "./components/3d/MainScene.tsx";
-import DefaultLayout from "@/components/default-layout.tsx";
+import MainScene from "./components/3d/MainScene";
+import DefaultLayout from "@/components/default-layout";
 import { Provider } from "mobx-react";
-import { sceneStore } from "./stores/scene-store.ts";
+import { sceneStore } from "./stores/scene-store";
 
-function App() {
+export default function App() {
   return (
     <div className="h-screen">
       <Provider sceneStore={sceneStore}>
-        <MainScene sceneId="1" />
+        <MainScene sceneId={sceneStore.selectedScene?.id || "1"} />
         <DefaultLayout />
       </Provider>
     </div>
   );
 }
-
-export default App;

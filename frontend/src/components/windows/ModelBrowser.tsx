@@ -156,6 +156,8 @@ const ModelBrowser: React.FC = observer(() => {
   return (
     <div className="flex flex-col gap-8">
       <div>
+        <h2 className="text-2xl font-bold text-gray-100">Model Browser</h2>
+
         <h2 className="text-xl font-semibold mb-4">Primitive Shapes</h2>
         {renderModelList(shapesList)}
       </div>

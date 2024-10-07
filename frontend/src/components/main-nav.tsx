@@ -1,4 +1,4 @@
-import { Bot, Play, Square, Trash } from "lucide-react";
+import { Bot, Clapperboard, Play, Square, Trash } from "lucide-react";
 import Logo from "../assets/favicon.ico";
 import {
   Tooltip,
@@ -29,6 +29,11 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
       icon: <Bot height={35} width={35} />,
     },
     { tag: "delete", name: "Delete", icon: <Trash height={35} width={35} /> },
+    {
+      tag: "scene-selector",
+      name: "Scenes",
+      icon: <Clapperboard height={35} width={35} />,
+    },
   ];
   return (
     <nav className="fixed bottom-[5%] left-0 right-0 mx-auto w-10/12 md:w-7/12 h-auto md:h-20">
