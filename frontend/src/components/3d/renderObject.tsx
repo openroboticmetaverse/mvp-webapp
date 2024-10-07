@@ -1,4 +1,4 @@
-import { ObjectData } from "../../api/sceneService";
+import { IObject } from "@/types/Interfaces";
 
 /**
  * Renders a 3D object according to the given ObjectData.
@@ -9,7 +9,7 @@ import { ObjectData } from "../../api/sceneService";
  * @returns A JSX element representing the object mesh.
  */
 export const renderObject = (
-  obj: ObjectData,
+  obj: IObject,
   setSelectedId: (id: string | null) => void
 ) => {
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, memo } from "react";
+import { useEffect, useState, useRef, memo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   GizmoHelper,
@@ -221,6 +221,7 @@ const SceneContent: React.FC = observer(() => {
         <TransformControls
           object={selectedObject}
           onObjectChange={handleObjectChange}
+          size={0.7}
         />
       )}
     </>

@@ -5,18 +5,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import URDFLoader from "urdf-loader";
 import * as THREE from "three";
 
-/**
- * Renders a 3D representation of a robot based on its reference type.
- * Supports URDF and GLTF formats, with a fallback to a placeholder box.
- *
- * @param {IRobot} robot - The robot data to render.
- * @returns {JSX.Element | null} A JSX element representing the robot mesh or null if data is invalid.
- */
-export const renderRobot = (robot: IRobot | undefined) => {
+export const renderRobot = (
+  robot: IRobot | undefined,
+  setSelectedId: (id: string | null) => void
+) => {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useThree();
 
-  // Check if robot object is defined
   if (!robot) {
     console.error("Robot object is undefined");
     return null;
@@ -24,7 +19,6 @@ export const renderRobot = (robot: IRobot | undefined) => {
 
   const { robot_reference } = robot;
 
-  // Check if robot_reference is defined
   if (!robot_reference) {
     console.error("Robot reference is undefined:", robot);
     return (
@@ -35,37 +29,41 @@ export const renderRobot = (robot: IRobot | undefined) => {
     );
   }
 
-  // Determine the robot type from the reference
   const isURDF = robot_reference.toLowerCase().endsWith("urdf");
   const isGLTF =
     robot_reference.toLowerCase().endsWith("gltf") ||
     robot_reference.toLowerCase().endsWith("glb");
 
-  // Load GLTF model if applicable
   const gltf = isGLTF
     ? useLoader(
         GLTFLoader,
         `/models/${robot_reference}`,
-        undefined,
+        (loader) => {
+          loader.manager.onProgress = (_, loaded, total) => {
+            const progress = (loaded / total) * 100;
+            console.log(`GLTF loading progress: ${progress.toFixed(2)}%`);
+          };
+        },
         (error) => {
-          console.error("Error loading GLTF model:", error);
+          console.error(
+            "Error loading GLTF model:",
+            error instanceof Error ? error.message : error
+          );
         }
       )
     : null;
 
   useEffect(() => {
     if (isURDF && groupRef.current) {
-      // Load URDF
       const loader = new URDFLoader();
       loader.load(
         `/models/${robot_reference}`,
         (urdfRobot) => {
-          if (groupRef.current) {
-            groupRef.current.add(urdfRobot);
-          }
+          groupRef.current?.add(urdfRobot);
         },
         (xhr) => {
-          console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+          const progress = (xhr.loaded / xhr.total) * 100;
+          console.log(`URDF loading progress: ${progress.toFixed(2)}%`);
         },
         (error) => {
           console.error("Error loading URDF:", error);
@@ -73,12 +71,9 @@ export const renderRobot = (robot: IRobot | undefined) => {
       );
     }
 
-    // Cleanup function
     return () => {
       if (groupRef.current) {
-        while (groupRef.current.children.length) {
-          groupRef.current.remove(groupRef.current.children[0]);
-        }
+        groupRef.current.clear();
       }
     };
   }, [robot_reference, isURDF, scene]);
@@ -88,12 +83,23 @@ export const renderRobot = (robot: IRobot | undefined) => {
   }
 
   return (
-    <group ref={groupRef}>
+    <group
+      ref={groupRef}
+      onClick={(event) => {
+        event.stopPropagation();
+        setSelectedId(robot.id);
+      }}
+    >
       {!isURDF && !isGLTF && (
-        // Fallback to placeholder box if neither URDF nor GLTF
         <mesh>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="gray" />
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial color="pink" />
+        </mesh>
+      )}
+      {(isURDF || isGLTF) && (
+        <mesh>
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial color="yellow" />
         </mesh>
       )}
     </group>

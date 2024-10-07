@@ -40,7 +40,7 @@ const fakeRobots: IRobot[] = [
     orientation: [0, 0, 0],
     scale: [1, 1, 1],
     joint_angles: [0, 0, 0],
-    robot_reference: "refRobot1",
+    robot_reference: "/MCX-Anthropomorphic-Robot-R01.glb",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },

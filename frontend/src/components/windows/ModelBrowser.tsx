@@ -113,14 +113,14 @@ const ModelBrowser: React.FC = observer(() => {
         const newObject: IObject = {
           ...commonData,
           color: "#FFFFFF", // Default color
-          objectReference: modelInfo.objectReference!,
+          object_reference: modelInfo.objectReference!,
         };
         sceneStore.addObject(newObject);
       } else if (modelInfo.type === "robot") {
         const newRobot: IRobot = {
           ...commonData,
-          jointAngles: [0, 0, 0], // Default joint angles
-          robotReference: modelInfo.robotReference!,
+          joint_angles: [0, 0, 0], // Default joint angles
+          robot_reference: modelInfo.robotReference!,
         };
         sceneStore.addRobot(newRobot);
       }

@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction, computed } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import {
   fetchSceneData,
   fetchObjectsForScene,
