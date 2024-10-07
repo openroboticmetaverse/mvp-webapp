@@ -155,7 +155,7 @@ const SceneContent: React.FC<{
 };
 
 const ObjectWrapper: React.FC<{
-  obj: any; // Replace with proper type
+  obj: ObjectData; // Use the proper type
   setSelectedId: (id: string | null) => void;
   objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
 }> = ({ obj, setSelectedId, objectsRef }) => {
@@ -164,9 +164,13 @@ const ObjectWrapper: React.FC<{
 
   useEffect(() => {
     const object = new Object3D();
-    object.position.set(...obj.position);
-    object.rotation.set(...obj.orientation);
-    object.scale.set(...obj.scale);
+    object.position.set(obj.position[0], obj.position[1], obj.position[2]);
+    object.rotation.set(
+      obj.orientation[0],
+      obj.orientation[1],
+      obj.orientation[2]
+    );
+    object.scale.set(obj.scale[0], obj.scale[1], obj.scale[2]);
 
     scene.add(object);
     objectsRef.current[obj.id] = object;
@@ -191,7 +195,7 @@ const ObjectWrapper: React.FC<{
 };
 
 const RobotWrapper: React.FC<{
-  robot: any; // Replace with proper type
+  robot: RobotData; // Use the proper type
   setSelectedId: (id: string | null) => void;
   objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
 }> = ({ robot, setSelectedId, objectsRef }) => {
@@ -200,9 +204,17 @@ const RobotWrapper: React.FC<{
 
   useEffect(() => {
     const object = new Object3D();
-    object.position.set(...robot.position);
-    object.rotation.set(...robot.orientation);
-    object.scale.set(...robot.scale);
+    object.position.set(
+      robot.position[0],
+      robot.position[1],
+      robot.position[2]
+    );
+    object.rotation.set(
+      robot.orientation[0],
+      robot.orientation[1],
+      robot.orientation[2]
+    );
+    object.scale.set(robot.scale[0], robot.scale[1], robot.scale[2]);
 
     scene.add(object);
     objectsRef.current[robot.id] = object;
