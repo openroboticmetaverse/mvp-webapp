@@ -1,14 +1,25 @@
-import { makeAutoObservable, runInAction } from "mobx";
-import { fetchSceneData, saveSceneData } from "../api/sceneService";
-import { SceneData, RobotData, ObjectData } from "../types/Interfaces";
+import { makeAutoObservable, runInAction, computed } from "mobx";
+import {
+  fetchSceneData,
+  fetchObjectsForScene,
+  fetchRobotsForScene,
+  saveSceneData,
+  saveObject,
+  saveRobot,
+} from "../api/sceneService";
+import { IScene, IRobot, IObject } from "../types/Interfaces";
 
 /**
- * SceneStore manages the state and operations for a scene in the application.
+ * SceneStore manages the state and operations for a scene, its objects, and robots in the application.
  * It handles loading, updating, and saving scene data, as well as managing the selected object/robot.
  */
 class SceneStore {
   /** The current scene data */
-  sceneData: SceneData | null = null;
+  sceneData: IScene | null = null;
+  /** Objects associated with the current scene */
+  objects: IObject[] = [];
+  /** Robots associated with the current scene */
+  robots: IRobot[] = [];
   /** The ID of the currently selected object or robot */
   selectedId: string | null = null;
   /** Indicates whether a data operation is in progress */
@@ -22,7 +33,7 @@ class SceneStore {
   }
 
   /**
-   * Fetches scene data from the server.
+   * Fetches scene data and associated objects and robots from the server.
    * @param {string} sceneId - The ID of the scene to fetch.
    */
   async fetchScene(sceneId: string) {
@@ -30,18 +41,22 @@ class SceneStore {
     this.isLoading = true;
     this.error = null;
     try {
-      const data = await fetchSceneData(sceneId);
-      console.log("Scene data fetched successfully", data);
+      const [sceneData, objectsData, robotsData] = await Promise.all([
+        fetchSceneData(sceneId),
+        fetchObjectsForScene(sceneId),
+        fetchRobotsForScene(sceneId),
+      ]);
+      console.log("Scene data and associated entities fetched successfully");
       runInAction(() => {
-        this.sceneData = data;
+        this.sceneData = sceneData;
+        this.objects = objectsData;
+        this.robots = robotsData;
         this.isLoading = false;
       });
     } catch (error) {
-      console.error("Error fetching scene data", error);
+      console.error("Error fetching scene data and associated entities", error);
       runInAction(() => {
-        if (error instanceof Error) {
-          console.log(error.message);
-        }
+        this.error = error instanceof Error ? error.message : String(error);
         this.isLoading = false;
       });
     }
@@ -57,66 +72,42 @@ class SceneStore {
   };
 
   /**
-   * Updates an object in the scene.
+   * Updates an object in the store.
    * @param {string} id - The ID of the object to update.
-   * @param {Partial<ObjectData>} updates - The properties to update on the object.
+   * @param {Partial<IObject>} updates - The properties to update on the object.
    */
-  updateObject(id: string, updates: Partial<ObjectData>) {
+  updateObject(id: string, updates: Partial<IObject>) {
     console.log(`Updating object with ID: ${id}`, updates);
-    if (!this.sceneData) {
-      console.warn("No scene data available to update object");
-      return;
-    }
-    const objectIndex = this.sceneData.objects.findIndex(
-      (obj) => obj.id === id
-    );
+    const objectIndex = this.objects.findIndex((obj) => obj.id === id);
     if (objectIndex !== -1) {
-      this.sceneData.objects[objectIndex] = {
-        ...this.sceneData.objects[objectIndex],
-        ...updates,
-      };
-      console.log(
-        "Object updated successfully",
-        this.sceneData.objects[objectIndex]
-      );
+      this.objects[objectIndex] = { ...this.objects[objectIndex], ...updates };
+      console.log("Object updated successfully", this.objects[objectIndex]);
     } else {
       console.warn(`Object with ID: ${id} not found`);
     }
   }
 
   /**
-   * Updates a robot in the scene.
+   * Updates a robot in the store.
    * @param {string} id - The ID of the robot to update.
-   * @param {Partial<RobotData>} updates - The properties to update on the robot.
+   * @param {Partial<IRobot>} updates - The properties to update on the robot.
    */
-  updateRobot(id: string, updates: Partial<RobotData>) {
+  updateRobot(id: string, updates: Partial<IRobot>) {
     console.log(`Updating robot with ID: ${id}`, updates);
-    if (!this.sceneData) {
-      console.warn("No scene data available to update robot");
-      return;
-    }
-    const robotIndex = this.sceneData.robots.findIndex(
-      (robot) => robot.id === id
-    );
+    const robotIndex = this.robots.findIndex((robot) => robot.id === id);
     if (robotIndex !== -1) {
-      this.sceneData.robots[robotIndex] = {
-        ...this.sceneData.robots[robotIndex],
-        ...updates,
-      };
-      console.log(
-        "Robot updated successfully",
-        this.sceneData.robots[robotIndex]
-      );
+      this.robots[robotIndex] = { ...this.robots[robotIndex], ...updates };
+      console.log("Robot updated successfully", this.robots[robotIndex]);
     } else {
       console.warn(`Robot with ID: ${id} not found`);
     }
   }
 
   /**
-   * Saves the current scene data to the server.
+   * Saves the current scene data, objects, and robots to the server.
    */
   async saveScene() {
-    console.log("Saving scene data");
+    console.log("Saving scene data and associated entities");
     if (!this.sceneData) {
       console.warn("No scene data available to save");
       return;
@@ -124,32 +115,68 @@ class SceneStore {
     this.isLoading = true;
     this.error = null;
     try {
-      const sceneDataToSave = { ...this.sceneData };
-      const savedData = await saveSceneData(sceneDataToSave);
-      console.log("Scene data saved successfully");
+      const [savedSceneData, savedObjects, savedRobots] = await Promise.all([
+        saveSceneData(this.sceneData),
+        Promise.all(this.objects.map((obj) => saveObject(obj))),
+        Promise.all(this.robots.map((robot) => saveRobot(robot))),
+      ]);
+      console.log("Scene data and associated entities saved successfully");
       runInAction(() => {
-        this.sceneData = savedData;
+        this.sceneData = savedSceneData;
+        this.objects = savedObjects;
+        this.robots = savedRobots;
         this.isLoading = false;
       });
     } catch (error) {
-      console.error("Error saving scene data", error);
+      console.error("Error saving scene data and associated entities", error);
       runInAction(() => {
-        if (error instanceof Error) {
-          this.error = error.message;
-        } else {
-          this.error = String(error);
-        }
+        this.error = error instanceof Error ? error.message : String(error);
         this.isLoading = false;
       });
     }
   }
 
-  addObject(newObject: ObjectData) {
-    this.sceneData!.objects.push(newObject);
+  /**
+   * Adds a new object to the store.
+   * @param {IObject} newObject - The new object to add to the store.
+   */
+  addObject(newObject: IObject) {
+    if (!this.sceneData) {
+      console.warn("No scene data available to add object");
+      return;
+    }
+    newObject.scene_id = this.sceneData.id;
+    this.objects.push(newObject);
+    console.log("New object added to store", newObject);
   }
 
-  addRobot(newRobot: RobotData) {
-    this.sceneData!.robots.push(newRobot);
+  /**
+   * Adds a new robot to the store.
+   * @param {IRobot} newRobot - The new robot to add to the store.
+   */
+  addRobot(newRobot: IRobot) {
+    if (!this.sceneData) {
+      console.warn("No scene data available to add robot");
+      return;
+    }
+    newRobot.scene_id = this.sceneData.id;
+    this.robots.push(newRobot);
+    console.log("New robot added to store", newRobot);
+  }
+  get objectsById() {
+    return new Map(this.objects.map((obj) => [obj.id, obj]));
+  }
+
+  get robotsById() {
+    return new Map(this.robots.map((robot) => [robot.id, robot]));
+  }
+
+  getObjectById(id: string) {
+    return this.objectsById.get(id);
+  }
+
+  getRobotById(id: string) {
+    return this.robotsById.get(id);
   }
 }
 

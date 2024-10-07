@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import React, { useEffect, useState, useRef, memo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   GizmoHelper,
   GizmoViewport,
@@ -10,7 +10,7 @@ import {
 } from "@react-three/drei";
 import { Object3D } from "three";
 import { observer } from "mobx-react";
-import { RobotData, ObjectData } from "@/types/Interfaces";
+import { IRobot, IObject } from "@/types/Interfaces";
 import { renderObject } from "./renderObject";
 import { renderRobot } from "./renderRobot";
 import LoadingScreen from "../ui/LoadingScreen";
@@ -21,23 +21,29 @@ interface MainSceneProps {
   sceneId: string;
 }
 
+// Main component for the 3D scene
 const MainScene: React.FC<MainSceneProps> = observer(({ sceneId }) => {
+  // Fetch scene data when the component mounts or sceneId changes
   useEffect(() => {
     sceneStore.fetchScene(sceneId);
   }, [sceneId]);
 
+  // Handler for saving the scene
   const handleSaveScene = async () => {
     await sceneStore.saveScene();
   };
 
+  // Render loading screen while data is being fetched
   if (sceneStore.isLoading) {
     return <LoadingScreen />;
   }
 
+  // Render error message if there's an error
   if (sceneStore.error) {
     return <div>Error: {sceneStore.error}</div>;
   }
 
+  // Render message if no scene data is available
   if (!sceneStore.sceneData) {
     return <div>No scene data available</div>;
   }
@@ -64,31 +70,99 @@ const MainScene: React.FC<MainSceneProps> = observer(({ sceneId }) => {
   );
 });
 
-// Separate component for scene content to use hooks
+// Component for rendering the scene content
 const SceneContent: React.FC = observer(() => {
   const { scene } = useThree();
   const objectsRef = useRef<{ [key: string]: Object3D }>({});
+  const [selectedObject, setSelectedObject] = useState<Object3D | null>(null);
 
-  useEffect(() => {
-    return () => {
-      Object.values(objectsRef.current).forEach((obj) => {
-        scene.remove(obj);
-      });
-    };
-  }, [scene]);
+  // Use useFrame to continuously update objects
+  useFrame(() => {
+    // Update objects
+    sceneStore.objects.forEach((obj) => updateOrCreateObject(obj, "object"));
+    sceneStore.robots.forEach((robot) => updateOrCreateObject(robot, "robot"));
 
+    // Remove objects that are no longer in the store
+    removeStaleObjects();
+
+    // Update selected object
+    updateSelectedObject();
+  });
+
+  // Function to update or create an object in the scene
+  const updateOrCreateObject = (
+    item: IObject | IRobot,
+    type: "object" | "robot"
+  ) => {
+    if (!objectsRef.current[item.id]) {
+      const newObject = createObject(item, type);
+      scene.add(newObject);
+      objectsRef.current[item.id] = newObject;
+    } else {
+      updateObjectProperties(objectsRef.current[item.id], item);
+    }
+  };
+
+  // Function to create a new Object3D
+  const createObject = (
+    item: IObject | IRobot,
+    type: "object" | "robot"
+  ): Object3D => {
+    const newObject = new Object3D();
+    updateObjectProperties(newObject, item);
+    newObject.userData = { id: item.id, type };
+    return newObject;
+  };
+
+  // Function to update Object3D properties
+  const updateObjectProperties = (object: Object3D, item: IObject | IRobot) => {
+    object.position.set(item.position[0], item.position[1], item.position[2]);
+    object.rotation.set(
+      item.orientation[0],
+      item.orientation[1],
+      item.orientation[2]
+    );
+    object.scale.set(item.scale[0], item.scale[1], item.scale[2]);
+  };
+
+  // Function to remove stale objects from the scene
+  const removeStaleObjects = () => {
+    Object.keys(objectsRef.current).forEach((id) => {
+      if (
+        !sceneStore.objects.some((obj) => obj.id === id) &&
+        !sceneStore.robots.some((robot) => robot.id === id)
+      ) {
+        scene.remove(objectsRef.current[id]);
+        delete objectsRef.current[id];
+      }
+    });
+  };
+
+  // Function to update the selected object
+  const updateSelectedObject = () => {
+    if (sceneStore.selectedId && objectsRef.current[sceneStore.selectedId]) {
+      setSelectedObject(objectsRef.current[sceneStore.selectedId]);
+    } else {
+      setSelectedObject(null);
+    }
+  };
+
+  // Handler for object transformation
   const handleObjectChange = (event: any) => {
     const target = event.target.object;
     console.log("Object transformed:", target);
     const id = target.userData.id;
-    sceneStore.updateObject(id, {
+    const updates = {
       position: target.position.toArray(),
       orientation: target.rotation.toArray(),
       scale: target.scale.toArray(),
-    });
+    };
+    if (target.userData.type === "object") {
+      sceneStore.updateObject(id, updates);
+    } else if (target.userData.type === "robot") {
+      sceneStore.updateRobot(id, updates);
+    }
   };
-
-  if (!sceneStore.sceneData) return null;
 
   return (
     <>
@@ -114,117 +188,69 @@ const SceneContent: React.FC = observer(() => {
         />
       </GizmoHelper>
 
-      {sceneStore.sceneData.objects.map((obj) => (
-        <ObjectWrapper
-          key={obj.id}
-          obj={obj}
-          setSelectedId={sceneStore.setSelectedId}
-          objectsRef={objectsRef}
-        />
-      ))}
+      {Object.entries(objectsRef.current).map(([id, obj]) => {
+        const isObject = obj.userData.type === "object";
+        const item = isObject
+          ? sceneStore.getObjectById(id)
+          : sceneStore.getRobotById(id);
 
-      {sceneStore.sceneData.robots.map((robot) => (
-        <RobotWrapper
-          key={robot.id}
-          robot={robot}
-          setSelectedId={sceneStore.setSelectedId}
-          objectsRef={objectsRef}
-        />
-      ))}
+        if (!item) return null;
 
-      {sceneStore.selectedId && objectsRef.current[sceneStore.selectedId] && (
+        return (
+          <primitive
+            key={id}
+            object={obj}
+            onClick={() => sceneStore.setSelectedId(id)}
+          >
+            {isObject ? (
+              <ObjectRenderer
+                object={item as IObject}
+                setSelectedId={sceneStore.setSelectedId}
+              />
+            ) : (
+              <RobotRenderer
+                robot={item as IRobot}
+                setSelectedId={sceneStore.setSelectedId}
+              />
+            )}
+          </primitive>
+        );
+      })}
+
+      {selectedObject && (
         <TransformControls
-          object={objectsRef.current[sceneStore.selectedId]}
+          object={selectedObject}
           onObjectChange={handleObjectChange}
-          size={0.7}
         />
       )}
     </>
   );
 });
 
-const ObjectWrapper: React.FC<{
-  obj: ObjectData;
-  setSelectedId: (id: string | null) => void;
-  objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
-}> = observer(({ obj, setSelectedId, objectsRef }) => {
-  const { scene } = useThree();
-  const [isReady, setIsReady] = useState(false);
+// Memoized component for rendering objects
+const ObjectRenderer = memo(
+  ({
+    object,
+    setSelectedId,
+  }: {
+    object: IObject;
+    setSelectedId: (id: string | null) => void;
+  }) => {
+    return renderObject(object, setSelectedId);
+  }
+);
 
-  useEffect(() => {
-    const object = new Object3D();
-    object.position.set(obj.position[0], obj.position[1], obj.position[2]);
-    object.rotation.set(
-      obj.orientation[0],
-      obj.orientation[1],
-      obj.orientation[2]
-    );
-    object.scale.set(obj.scale[0], obj.scale[1], obj.scale[2]);
-
-    scene.add(object);
-    objectsRef.current[obj.id] = object;
-    setIsReady(true);
-
-    return () => {
-      scene.remove(object);
-      delete objectsRef.current[obj.id];
-    };
-  }, [obj, scene, objectsRef]);
-
-  if (!isReady) return null;
-
-  return (
-    <primitive
-      object={objectsRef.current[obj.id]}
-      onClick={() => setSelectedId(obj.id)}
-    >
-      {renderObject(obj, setSelectedId)}
-    </primitive>
-  );
-});
-
-const RobotWrapper: React.FC<{
-  robot: RobotData;
-  setSelectedId: (id: string | null) => void;
-  objectsRef: React.MutableRefObject<{ [key: string]: Object3D }>;
-}> = observer(({ robot, setSelectedId, objectsRef }) => {
-  const { scene } = useThree();
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const object = new Object3D();
-    object.position.set(
-      robot.position[0],
-      robot.position[1],
-      robot.position[2]
-    );
-    object.rotation.set(
-      robot.orientation[0],
-      robot.orientation[1],
-      robot.orientation[2]
-    );
-    object.scale.set(robot.scale[0], robot.scale[1], robot.scale[2]);
-
-    scene.add(object);
-    objectsRef.current[robot.id] = object;
-    setIsReady(true);
-
-    return () => {
-      scene.remove(object);
-      delete objectsRef.current[robot.id];
-    };
-  }, [robot, scene, objectsRef]);
-
-  if (!isReady) return null;
-
-  return (
-    <primitive
-      object={objectsRef.current[robot.id]}
-      onClick={() => setSelectedId(robot.id)}
-    >
-      {renderRobot(robot, setSelectedId)}
-    </primitive>
-  );
-});
+// Memoized component for rendering robots
+const RobotRenderer = memo(
+  ({
+    robot,
+    setSelectedId,
+  }: {
+    robot: IRobot;
+    setSelectedId: (id: string | null) => void;
+  }) => {
+    return renderRobot(robot, setSelectedId);
+  }
+);
 
 export default MainScene;

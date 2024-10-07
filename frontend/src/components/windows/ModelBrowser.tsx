@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import WindowCard from "@/components/ui/window-card";
 import {
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Bot, Box, Cylinder, Globe, Goal, Square, Torus } from "lucide-react";
 import { sceneStore } from "@/stores/scene-store";
-import { ObjectData, RobotData } from "@/types/Interfaces";
+import { IObject, IRobot } from "@/types/Interfaces";
 
 interface ModelInfo {
   name: string;
@@ -91,25 +91,33 @@ const ModelBrowser: React.FC = observer(() => {
 
   const handleAddModel = useCallback(
     (modelInfo: ModelInfo) => {
+      if (!sceneStore.sceneData) {
+        console.warn("No active scene to add model to");
+        return;
+      }
+
       const newId = `${modelInfo.type}_${Date.now()}`;
       const commonData = {
         id: newId,
         name: modelInfo.name,
         description: modelInfo.description,
+        scene_id: sceneStore.sceneData.id,
         position: [0, 0, 0] as [number, number, number],
         orientation: [0, 0, 0] as [number, number, number],
         scale: [1, 1, 1] as [number, number, number],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       if (modelInfo.type === "object") {
-        const newObject: ObjectData = {
+        const newObject: IObject = {
           ...commonData,
           color: "#FFFFFF", // Default color
           objectReference: modelInfo.objectReference!,
         };
         sceneStore.addObject(newObject);
       } else if (modelInfo.type === "robot") {
-        const newRobot: RobotData = {
+        const newRobot: IRobot = {
           ...commonData,
           jointAngles: [0, 0, 0], // Default joint angles
           robotReference: modelInfo.robotReference!,

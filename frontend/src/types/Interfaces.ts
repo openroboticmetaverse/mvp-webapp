@@ -1,113 +1,60 @@
 /**
- * Scene data interface
+ * Scene Management Interfaces
  */
-export interface SceneData {
-  /**
-   * Unique identifier for the scene
-   */
-  id: string;
-  /**
-   * Name of the scene
-   */
+
+// Base interface for objects and robots
+export interface IAbstractObject {
+  id: string; // PK
   name: string;
-  /**
-   * Description of the scene
-   */
   description: string;
-  /**
-   * Array of objects in the scene
-   */
-  objects: ObjectData[];
-  /**
-   * Array of robots in the scene
-   */
-  robots: RobotData[];
-  /**
-   * User ID of the user who created the scene
-   */
-  user_id: string;
-  /**
-   * Date and time when the scene was created
-   */
+  scene_id: string; // FK
+  position: [number, number, number]; // [x, y, z]
+  orientation: [number, number, number]; // [roll, pitch, yaw]
+  scale: [number, number, number]; // [x, y, z]
   created_at: string;
-  /**
-   * Date and time when the scene was last updated
-   */
   updated_at: string;
 }
 
-/**
- * Object data interface
- */
-export interface ObjectData {
-  /**
-   * Unique identifier for the object
-   */
-  id: string;
-  /**
-   * Name of the object
-   */
+// Scene interface
+export interface IScene {
+  id: string; // PK
   name: string;
-  /**
-   * Description of the object
-   */
+  user_id: string; // FK
   description: string;
-  /**
-   * Position of the object in 3D space
-   */
-  position: [number, number, number];
-  /**
-   * Orientation of the object in 3D space
-   */
-  orientation: [number, number, number];
-  /**
-   * Scale of the object in 3D space
-   */
-  scale: [number, number, number];
-  /**
-   * Color of the object
-   */
-  color: string;
-  /**
-   * Object reference
-   */
-  objectReference: string;
+  websocket_visual_id: string;
+  websocket_control_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Object interface (extends IAbstractObject)
+export interface IObject extends IAbstractObject {
+  object_reference: string; // FK
+  color: string; // RGB-Code
+}
+
+// Robot interface (extends IAbstractObject)
+export interface IRobot extends IAbstractObject {
+  robot_reference: string; // FK
+  joint_angles: number[]; // List of Double
 }
 
 /**
- * Robot data interface
+ * Object Library Interfaces
  */
-export interface RobotData {
-  /**
-   * Unique identifier for the robot
-   */
-  id: string;
-  /**
-   * Name of the robot
-   */
+
+// Base interface for object and robot references
+export interface IAbstractReference {
+  id: string; // PK
   name: string;
-  /**
-   * Description of the robot
-   */
+  file: File;
+  file_type: string;
   description: string;
-  /**
-   * Position of the robot in 3D space
-   */
-  position: [number, number, number];
-  /**
-   * Orientation of the robot in 3D space
-   */
-  orientation: [number, number, number];
-  /**
-   * Scale of the robot in 3D space
-   */
-  scale: [number, number, number];
-  /**
-   * Joint angles of the robot
-   */
-  jointAngles: number[];
-  /**
-   * Robot reference
-   */
-  robotReference: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// ReferenceRobot interface (extends IAbstractReference)
+export interface IReferenceRobot extends IAbstractReference {
+  num_joints: number;
 }
