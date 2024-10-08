@@ -58,3 +58,7 @@ export interface IAbstractReference {
 export interface IReferenceRobot extends IAbstractReference {
   num_joints: number;
 }
+
+export interface IReferenceObject extends IAbstractReference {
+  color: string; // Optional?
+}

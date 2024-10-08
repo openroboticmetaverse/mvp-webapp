@@ -1,56 +1,141 @@
-import axios from "axios";
-import { IObject, IRobot, IScene } from "@/types/Interfaces";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import {
+  IObject,
+  IRobot,
+  IScene,
+  IReferenceRobot,
+  IReferenceObject,
+} from "@/types/Interfaces";
 
+// Define the base URL for the API
 const BASE_URL = "http://pi.local:8000";
 
-const api = axios.create({
+// Create an axios instance with the base URL
+const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
 });
 
-export const fetchScenes = async () => {
-  const response = await api.get("/scene-manager/scenes/");
-  return response.data;
+// Helper function to handle API responses
+const handleResponse = <T>(response: AxiosResponse<T>): T => response.data;
+
+// Helper function to handle API errors
+const handleError = (error: any): never => {
+  console.error("API Error:", error.response?.data || error.message);
+  throw error;
 };
 
-export const fetchObjects = async () => {
-  const response = await api.get("/scene-manager/objects/");
-  return response.data;
+// Scene Manager API functions
+export const sceneManagerApi = {
+  // Scenes
+  fetchScenes: () =>
+    api
+      .get<IScene[]>("/scene-manager/scenes/")
+      .then(handleResponse)
+      .catch(handleError),
+  createScene: (sceneData: Partial<IScene>) =>
+    api
+      .post<IScene>("/scene-manager/scenes/", sceneData)
+      .then(handleResponse)
+      .catch(handleError),
+  updateScene: (id: string, sceneData: Partial<IScene>) =>
+    api
+      .put<IScene>(`/scene-manager/scenes/${id}/`, sceneData)
+      .then(handleResponse)
+      .catch(handleError),
+  deleteScene: (id: string) =>
+    api
+      .delete(`/scene-manager/scenes/${id}/`)
+      .then(handleResponse)
+      .catch(handleError),
+
+  // Objects
+  fetchObjects: () =>
+    api
+      .get<IObject[]>("/scene-manager/objects/")
+      .then(handleResponse)
+      .catch(handleError),
+  createObject: (objectData: Partial<IObject>) =>
+    api
+      .post<IObject>("/scene-manager/objects/", objectData)
+      .then(handleResponse)
+      .catch(handleError),
+  updateObject: (id: string, objectData: Partial<IObject>) =>
+    api
+      .put<IObject>(`/scene-manager/objects/${id}/`, objectData)
+      .then(handleResponse)
+      .catch(handleError),
+  deleteObject: (id: string) =>
+    api
+      .delete(`/scene-manager/objects/${id}/`)
+      .then(handleResponse)
+      .catch(handleError),
+
+  // Robots
+  fetchRobots: () =>
+    api
+      .get<IRobot[]>("/scene-manager/robots/")
+      .then(handleResponse)
+      .catch(handleError),
+  createRobot: (robotData: Partial<IRobot>) =>
+    api
+      .post<IRobot>("/scene-manager/robots/", robotData)
+      .then(handleResponse)
+      .catch(handleError),
+  updateRobot: (id: string, robotData: Partial<IRobot>) =>
+    api
+      .put<IRobot>(`/scene-manager/robots/${id}/`, robotData)
+      .then(handleResponse)
+      .catch(handleError),
+  deleteRobot: (id: string) =>
+    api
+      .delete(`/scene-manager/robots/${id}/`)
+      .then(handleResponse)
+      .catch(handleError),
 };
 
-export const fetchRobots = async () => {
-  const response = await api.get("/scene-manager/robots/");
-  return response.data;
-};
+// Object Library API functions
+export const objectLibraryApi = {
+  // Reference Robots
+  fetchReferenceRobots: () =>
+    api
+      .get<IReferenceRobot[]>("/library/ref-robots/")
+      .then(handleResponse)
+      .catch(handleError),
+  createReferenceRobot: (robotData: Partial<IReferenceRobot>) =>
+    api
+      .post<IReferenceRobot>("/library/ref-robots/", robotData)
+      .then(handleResponse)
+      .catch(handleError),
+  updateReferenceRobot: (id: string, robotData: Partial<IReferenceRobot>) =>
+    api
+      .put<IReferenceRobot>(`/library/ref-robots/${id}/`, robotData)
+      .then(handleResponse)
+      .catch(handleError),
+  deleteReferenceRobot: (id: string) =>
+    api
+      .delete(`/library/ref-robots/${id}/`)
+      .then(handleResponse)
+      .catch(handleError),
 
-export const createScene = async (sceneData: Partial<IScene>) => {
-  const response = await api.post("/scene-manager/scenes/", sceneData);
-  return response.data;
-};
-
-export const updateScene = async (id: string, sceneData: Partial<IScene>) => {
-  const response = await api.put(`/scene-manager/scenes/${id}/`, sceneData);
-  return response.data;
-};
-
-export const createObject = async (objectData: Partial<IObject>) => {
-  const response = await api.post("/scene-manager/objects/", objectData);
-  return response.data;
-};
-
-export const updateObject = async (
-  id: string,
-  objectData: Partial<IObject>
-) => {
-  const response = await api.put(`/scene-manager/objects/${id}/`, objectData);
-  return response.data;
-};
-
-export const createRobot = async (robotData: Partial<IRobot>) => {
-  const response = await api.post("/scene-manager/robots/", robotData);
-  return response.data;
-};
-
-export const updateRobot = async (id: string, robotData: Partial<IRobot>) => {
-  const response = await api.put(`/scene-manager/robots/${id}/`, robotData);
-  return response.data;
+  // Reference Objects
+  fetchReferenceObjects: () =>
+    api
+      .get<IReferenceObject[]>("/library/ref-objects/")
+      .then(handleResponse)
+      .catch(handleError),
+  createReferenceObject: (objectData: Partial<IReferenceObject>) =>
+    api
+      .post<IReferenceObject>("/library/ref-objects/", objectData)
+      .then(handleResponse)
+      .catch(handleError),
+  updateReferenceObject: (id: string, objectData: Partial<IReferenceObject>) =>
+    api
+      .put<IReferenceObject>(`/library/ref-objects/${id}/`, objectData)
+      .then(handleResponse)
+      .catch(handleError),
+  deleteReferenceObject: (id: string) =>
+    api
+      .delete(`/library/ref-objects/${id}/`)
+      .then(handleResponse)
+      .catch(handleError),
 };
