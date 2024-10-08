@@ -1,4 +1,13 @@
-import { Bot, Clapperboard, Play, Square, Trash } from "lucide-react";
+import {
+  Bot,
+  Boxes,
+  Clapperboard,
+  Component,
+  Package,
+  Play,
+  Square,
+  Trash,
+} from "lucide-react";
 import Logo from "../assets/favicon.ico";
 import {
   Tooltip,
@@ -16,23 +25,27 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
     {
       tag: "start",
       name: "Start Simulation",
-      icon: <Play height={35} width={35} />,
+      icon: <Play height={35} width={35} strokeWidth={1.5} />,
     },
     {
       tag: "stop",
       name: "Stop Simulation",
-      icon: <Square height={35} width={35} />,
+      icon: <Square height={35} width={35} strokeWidth={1.5} />,
     },
     {
       tag: "robot-browser",
-      name: "Robot Browser",
-      icon: <Bot height={35} width={35} />,
+      name: "Model Browser",
+      icon: <Package height={35} width={35} strokeWidth={1.5} />,
     },
-    { tag: "delete", name: "Delete", icon: <Trash height={35} width={35} /> },
+    {
+      tag: "delete",
+      name: "Delete",
+      icon: <Trash height={35} width={35} strokeWidth={1.5} />,
+    },
     {
       tag: "scene-selector",
       name: "Scenes",
-      icon: <Clapperboard height={35} width={35} />,
+      icon: <Clapperboard height={35} width={35} strokeWidth={1.5} />,
     },
   ];
   return (
