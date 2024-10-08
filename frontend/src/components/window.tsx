@@ -40,7 +40,9 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
           {/*  className="cursor-pointer ml-auto m-3"*/}
           {/*  onClick={() => setContent(null)}*/}
           {/*/>*/}
-          <div className="p-5">{content}</div>
+          <div className="p-4 h-full overflow-hidden flex flex-col">
+            {content}
+          </div>
         </div>
       )}
     </>
