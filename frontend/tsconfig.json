@@ -17,7 +17,9 @@
     "skipLibCheck": true, // Skips type checking of declaration files
     "forceConsistentCasingInFileNames": false, // Disables case sensitivity in file names
     "noUnusedLocals": false, // Disables errors on unused local variables
-    "noUnusedParameters": false // Disables errors on unused parameters in functions
+    "noUnusedParameters": false, // Disables errors on unused parameters in functions
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true
   },
   "references": [
     {

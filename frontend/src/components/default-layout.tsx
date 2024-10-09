@@ -2,8 +2,8 @@ import React from "react";
 import MainNav from "@/components/main-nav";
 import Window from "@/components/window";
 import { useState } from "react";
-import SceneModelsList from "./windows/SceneModelsList";
 import TopBar from "./windows/TopBar";
+import { Toaster } from "./ui/toaster";
 
 const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -19,10 +19,10 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({
   return (
     <div className="relative h-screen overflow-hidden flex">
       <main className="flex-1 overflow-hidden">{children}</main>
-      <SceneModelsList />
       <TopBar />
       <MainNav onButtonClick={handleOpenedWindow} />
       <Window position="right" windowTag={openedWindow} />
+      <Toaster />
       <div className="absolute bottom-4 left-7 text-white">
         <a href="https://www.netlify.com">
           <img
