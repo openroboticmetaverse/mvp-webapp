@@ -12,24 +12,53 @@ import { generateUniqueId } from "@/utils/idGenerator";
 import { errorLoggingService } from "../services/error-logging-service";
 
 /**
- * Base store with pending changes functionality and verbose logging
+ * Base store class with pending changes functionality and verbose logging.
+ * @template T - The type of items stored, must have an 'id' property.
  */
 class BasePendingStore<T extends { id: string }> {
+  /**
+   * The items stored in the store.
+   */
   @observable items: T[] = [];
+
+  /**
+   * A map of local updates to items that have not been saved yet.
+   */
   @observable pendingChanges = new Map<string, Partial<T>>();
+
+  /**
+   * A map of local creations of items that have not been saved yet.
+   */
   @observable pendingCreations = new Map<string, T>();
+
+  /**
+   * A set of local deletions of items that have not been saved yet.
+   */
   @observable pendingDeletions = new Set<string>();
+
+  /**
+   * The current state of the store.
+   */
   @observable state: {
     status: "idle" | "loading" | "success" | "error";
     error?: string;
     data?: T[];
   } = { status: "idle" };
 
+  /**
+   * Apply a local creation of an item.
+   * @param item - The item to be created locally.
+   */
   constructor() {
     makeObservable(this);
     errorLoggingService.debug(`${this.constructor.name} initialized`);
   }
 
+  /**
+   * Apply a local change to an existing item.
+   * @param id - The id of the item to be updated.
+   * @param updates - The partial updates to be applied to the item.
+   */
   @action
   protected applyLocalCreation(item: T) {
     this.pendingCreations.set(item.id, item);
@@ -40,6 +69,11 @@ class BasePendingStore<T extends { id: string }> {
     );
   }
 
+  /**
+   * Apply a local change to an existing item.
+   * @param id - The id of the item to be updated.
+   * @param updates - The partial updates to be applied to the item.
+   */
   @action
   protected applyLocalChange(id: string, updates: Partial<T>) {
     const existingChanges = this.pendingChanges.get(id) || {};
@@ -55,6 +89,10 @@ class BasePendingStore<T extends { id: string }> {
     );
   }
 
+  /**
+   * Apply a local deletion of an item.
+   * @param id - The id of the item to be deleted.
+   */
   @action
   protected applyLocalDeletion(id: string) {
     this.pendingDeletions.add(id);
@@ -64,6 +102,11 @@ class BasePendingStore<T extends { id: string }> {
     );
   }
 
+  /**
+   * Get the item with the given id, taking into account local changes.
+   * @param id - The id of the item to be retrieved.
+   * @returns The item with the given id, or undefined if it does not exist.
+   */
   protected getItemWithPendingChanges(id: string): T | undefined {
     const item = this.items.find((item) => item.id === id);
     const pendingChanges = this.pendingChanges.get(id);
@@ -75,6 +118,9 @@ class BasePendingStore<T extends { id: string }> {
     return item;
   }
 
+  /**
+   * Save all local changes to the server.
+   */
   @action
   async saveChanges(): Promise<void> {
     errorLoggingService.info(
@@ -118,6 +164,10 @@ class BasePendingStore<T extends { id: string }> {
     }
   }
 
+  /**
+   * Fetch all items from the server.
+   * @param fetcher - A function that returns a promise that resolves with an array of items.
+   */
   @action
   protected async fetchItems(fetcher: () => Promise<T[]>) {
     this.state = { status: "loading" };
@@ -143,6 +193,11 @@ class BasePendingStore<T extends { id: string }> {
     }
   }
 
+  /**
+   * Create a new item on the server.
+   * @param item - The item to be created.
+   * @returns A promise that resolves when the item has been created.
+   */
   protected async createItem(item: T): Promise<void> {
     errorLoggingService.error(
       `${this.constructor.name}: createItem must be implemented in derived class`
@@ -150,6 +205,12 @@ class BasePendingStore<T extends { id: string }> {
     throw new Error("createItem must be implemented in derived class");
   }
 
+  /**
+   * Save changes to an existing item on the server.
+   * @param id - The id of the item to be updated.
+   * @param updates - The partial updates to be applied to the item.
+   * @returns A promise that resolves when the item has been updated.
+   */
   protected async saveItem(id: string, updates: Partial<T>): Promise<void> {
     errorLoggingService.error(
       `${this.constructor.name}: saveItem must be implemented in derived class`
@@ -157,6 +218,11 @@ class BasePendingStore<T extends { id: string }> {
     throw new Error("saveItem must be implemented in derived class");
   }
 
+  /**
+   * Delete an existing item on the server.
+   * @param id - The id of the item to be deleted.
+   * @returns A promise that resolves when the item has been deleted.
+   */
   protected async deleteItem(id: string): Promise<void> {
     errorLoggingService.error(
       `${this.constructor.name}: deleteItem must be implemented in derived class`
@@ -171,11 +237,34 @@ export default BasePendingStore;
  * Store for managing scenes
  */
 class SceneStore extends BasePendingStore<IScene> {
+  /**
+   * The list of all scenes
+   */
   @observable scenes: IScene[] = [];
+
+  /**
+   * The list of all objects
+   */
   @observable objects: IObject[] = [];
+
+  /**
+   * The list of all robots
+   */
   @observable robots: IRobot[] = [];
+
+  /**
+   * The id of the currently active scene
+   */
   @observable activeSceneId: string | null = null;
+
+  /**
+   * The name of the new scene to be created
+   */
   @observable newSceneName: string = "";
+
+  /**
+   * The id of the currently selected item
+   */
   @observable selectedItemId: string | null = null;
 
   constructor() {
@@ -184,10 +273,16 @@ class SceneStore extends BasePendingStore<IScene> {
     errorLoggingService.debug("SceneStore initialized");
   }
 
+  /**
+   * The currently active scene
+   */
   @computed get activeScene() {
     return this.scenes.find((scene) => scene.id === this.activeSceneId);
   }
 
+  /**
+   * The objects in the currently active scene
+   */
   @computed get currentSceneObjects() {
     return this.objects
       .filter((obj) => obj.scene_id === this.activeSceneId)
@@ -199,6 +294,9 @@ class SceneStore extends BasePendingStore<IScene> {
       .filter((obj) => !this.pendingDeletions.has(obj.id));
   }
 
+  /**
+   * The robots in the currently active scene
+   */
   @computed get currentSceneRobots() {
     return this.robots
       .filter((robot) => robot.scene_id === this.activeSceneId)
@@ -208,6 +306,9 @@ class SceneStore extends BasePendingStore<IScene> {
       }));
   }
 
+  /**
+   * The currently selected item
+   */
   @computed get selectedItem() {
     if (!this.selectedItemId) return null;
     return (
@@ -219,18 +320,30 @@ class SceneStore extends BasePendingStore<IScene> {
     );
   }
 
+  /**
+   * Sets the active scene
+   * @param sceneId - The id of the scene to be activated
+   */
   @action
   setActiveScene(sceneId: string) {
     this.activeSceneId = sceneId;
     errorLoggingService.debug(`Active scene set to: ${sceneId}`);
   }
 
+  /**
+   * Sets the selected item
+   * @param itemId - The id of the item to be selected
+   */
   @action
   setSelectedItem(itemId: string | null) {
     this.selectedItemId = itemId;
     errorLoggingService.debug(`Selected item set to: ${itemId}`);
   }
 
+  /**
+   * Fetches scene data for the given scene
+   * @param sceneId - The id of the scene for which to fetch data
+   */
   @action
   async fetchSceneData(sceneId: string) {
     this.state = { status: "loading" };
@@ -269,11 +382,18 @@ class SceneStore extends BasePendingStore<IScene> {
     }
   }
 
+  /**
+   * Fetches all scenes
+   */
   @action
   async fetchScenes() {
     return this.fetchItems(sceneManagerApi.fetchScenes);
   }
 
+  /**
+   * Creates a new scene
+   * @param sceneData - The data for the new scene
+   */
   @action
   async createScene(sceneData: Partial<IScene>): Promise<IScene> {
     errorLoggingService.info("Creating new scene", sceneData);
@@ -290,6 +410,11 @@ class SceneStore extends BasePendingStore<IScene> {
     }
   }
 
+  /**
+   * Updates a scene
+   * @param id - The id of the scene to be updated
+   * @param updates - The updates to be applied to the scene
+   */
   @action
   async updateScene(id: string, updates: Partial<IScene>) {
     errorLoggingService.info(`Updating scene: ${id}`, updates);
@@ -299,6 +424,10 @@ class SceneStore extends BasePendingStore<IScene> {
     }
   }
 
+  /**
+   * Deletes a scene
+   * @param id - The id of the scene to be deleted
+   */
   @action
   async deleteScene(id: string) {
     errorLoggingService.info(`Deleting scene: ${id}`);
@@ -316,6 +445,12 @@ class SceneStore extends BasePendingStore<IScene> {
     }
   }
 
+  /**
+   * Save changes to an existing scene on the server.
+   * @param id - The id of the scene to be updated.
+   * @param updates - The partial updates to be applied to the scene.
+   * @returns A promise that resolves when the scene has been updated.
+   */
   protected async saveItem(
     id: string,
     updates: Partial<IScene>
@@ -337,6 +472,10 @@ class SceneStore extends BasePendingStore<IScene> {
     }
   }
 
+  /**
+   * Saves all pending changes to the server, including those in the object and
+   * robot stores.
+   */
   async saveChanges(): Promise<void> {
     errorLoggingService.info("Saving all changes in SceneStore");
     try {
@@ -357,6 +496,9 @@ class SceneStore extends BasePendingStore<IScene> {
 /**
  * Store for managing objects
  */
+/**
+ * Store for managing objects
+ */
 class ObjectStore extends BasePendingStore<IObject> {
   constructor() {
     super();
@@ -364,12 +506,20 @@ class ObjectStore extends BasePendingStore<IObject> {
     errorLoggingService.debug("ObjectStore initialized");
   }
 
+  /**
+   * Fetches objects from the server
+   */
   @action
-  fetchObjects() {
+  fetchObjects(): Promise<void> {
     errorLoggingService.info("Fetching objects");
     return this.fetchItems(sceneManagerApi.fetchObjects);
   }
 
+  /**
+   * Creates a new object
+   * @param objectData - The data to create the object with
+   * @returns The newly created object
+   */
   @action
   async createObject(objectData: Partial<IObject>): Promise<IObject> {
     errorLoggingService.info("Creating new object", objectData);
@@ -386,6 +536,11 @@ class ObjectStore extends BasePendingStore<IObject> {
     }
   }
 
+  /**
+   * Updates an existing object
+   * @param id - The id of the object to update
+   * @param updates - The updated object data
+   */
   @action
   async updateObject(id: string, updates: Partial<IObject>) {
     errorLoggingService.info(`Updating object: ${id}`, updates);
@@ -395,12 +550,21 @@ class ObjectStore extends BasePendingStore<IObject> {
     }
   }
 
+  /**
+   * Deletes an object
+   * @param id - The id of the object to delete
+   */
   @action
   async deleteObject(id: string) {
     errorLoggingService.info(`Deleting object: ${id}`);
     this.applyLocalDeletion(id);
   }
 
+  /**
+   * Retrieves objects for a specific scene
+   * @param sceneId - The id of the scene to retrieve objects for
+   * @returns The objects for the given scene
+   */
   @computed
   get objectsByScene() {
     return (sceneId: string): IObject[] => {
@@ -414,6 +578,11 @@ class ObjectStore extends BasePendingStore<IObject> {
     };
   }
 
+  /**
+   * Creates a new object from a reference object
+   * @param referenceId - The id of the reference object to create from
+   * @returns The newly created object
+   */
   @action
   async createObjectFromReference(
     referenceId: string
@@ -451,6 +620,10 @@ class ObjectStore extends BasePendingStore<IObject> {
     return newObject;
   }
 
+  /**
+   * Creates a new object on the server
+   * @param item - The object to create
+   */
   protected async createItem(item: IObject): Promise<void> {
     errorLoggingService.info("Creating object item", item);
     const createdObject = await sceneManagerApi.createObject(item);
@@ -463,6 +636,11 @@ class ObjectStore extends BasePendingStore<IObject> {
     errorLoggingService.info("Object item created successfully", createdObject);
   }
 
+  /**
+   * Saves an object on the server
+   * @param id - The id of the object to save
+   * @param updates - The updated object data
+   */
   protected async saveItem(
     id: string,
     updates: Partial<IObject>
@@ -484,6 +662,10 @@ class ObjectStore extends BasePendingStore<IObject> {
     }
   }
 
+  /**
+   * Deletes an object on the server
+   * @param id - The id of the object to delete
+   */
   protected async deleteItem(id: string): Promise<void> {
     errorLoggingService.info(`Deleting object: ${id}`);
     await sceneManagerApi.deleteObject(id);
@@ -495,18 +677,28 @@ class ObjectStore extends BasePendingStore<IObject> {
  * Store for managing robots
  */
 class RobotStore extends BasePendingStore<IRobot> {
+  /**
+   * Creates a new instance of the store
+   */
   constructor() {
     super();
     makeObservable(this);
     errorLoggingService.debug("RobotStore initialized");
   }
 
+  /**
+   * Fetches all robots
+   */
   @action
   fetchRobots() {
     errorLoggingService.info("Fetching robots");
     return this.fetchItems(sceneManagerApi.fetchRobots);
   }
 
+  /**
+   * Creates a new robot
+   * @param robotData The data for the new robot
+   */
   @action
   async createRobot(robotData: Partial<IRobot>): Promise<IRobot> {
     errorLoggingService.info("Creating new robot", robotData);
@@ -523,6 +715,11 @@ class RobotStore extends BasePendingStore<IRobot> {
     }
   }
 
+  /**
+   * Updates an existing robot
+   * @param id The id of the robot to update
+   * @param updates The updated robot data
+   */
   @action
   async updateRobot(id: string, updates: Partial<IRobot>) {
     errorLoggingService.info(`Updating robot: ${id}`, updates);
@@ -532,12 +729,20 @@ class RobotStore extends BasePendingStore<IRobot> {
     }
   }
 
+  /**
+   * Deletes an existing robot
+   * @param id The id of the robot to delete
+   */
   @action
   async deleteRobot(id: string) {
     errorLoggingService.info(`Deleting robot: ${id}`);
     this.applyLocalDeletion(id);
   }
 
+  /**
+   * Retrieves all robots for a given scene
+   * @param sceneId The id of the scene
+   */
   @computed
   get robotsByScene() {
     return (sceneId: string): IRobot[] => {
@@ -551,6 +756,10 @@ class RobotStore extends BasePendingStore<IRobot> {
     };
   }
 
+  /**
+   * Creates a new robot from a reference robot
+   * @param referenceId The id of the reference robot
+   */
   @action
   async createRobotFromReference(
     referenceId: string
@@ -588,6 +797,10 @@ class RobotStore extends BasePendingStore<IRobot> {
     return newRobot;
   }
 
+  /**
+   * Creates a new robot item
+   * @param item The data for the new robot item
+   */
   protected async createItem(item: IRobot): Promise<void> {
     errorLoggingService.info("Creating robot item", item);
     const createdRobot = await sceneManagerApi.createRobot(item);
@@ -600,6 +813,11 @@ class RobotStore extends BasePendingStore<IRobot> {
     errorLoggingService.info("Robot item created successfully", createdRobot);
   }
 
+  /**
+   * Saves an existing robot item
+   * @param id The id of the robot item to save
+   * @param updates The updated robot item data
+   */
   protected async saveItem(
     id: string,
     updates: Partial<IRobot>
@@ -621,6 +839,10 @@ class RobotStore extends BasePendingStore<IRobot> {
     }
   }
 
+  /**
+   * Deletes an existing robot item
+   * @param id The id of the robot item to delete
+   */
   protected async deleteItem(id: string): Promise<void> {
     errorLoggingService.info(`Deleting robot: ${id}`);
     await sceneManagerApi.deleteRobot(id);
