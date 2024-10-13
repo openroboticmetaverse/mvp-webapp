@@ -69,13 +69,6 @@ const SceneItem: React.FC<SceneItemProps> = React.memo(
   )
 );
 
-/**
- * SceneSelector component renders a list of available scenes in the scene store.
- * It allows the user to select a scene, create a new scene, or refresh the list.
- *
- * @returns A React component that renders the scene selector.
- */
-
 const SceneSelector = observer(() => {
   const [newSceneName, setNewSceneName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -89,8 +82,9 @@ const SceneSelector = observer(() => {
     }
   }, []);
 
-  const handleSceneSelect = useCallback((scene: IScene) => {
+  const handleSceneSelect = useCallback(async (scene: IScene) => {
     sceneStore.setActiveScene(scene.id);
+    await sceneStore.fetchSceneData(scene.id);
   }, []);
 
   const handleNewScene = useCallback(async () => {
@@ -99,16 +93,22 @@ const SceneSelector = observer(() => {
       return;
     }
     try {
-      await sceneStore.createScene({ name: newSceneName.trim() });
+      const newScene = await sceneStore.createScene({
+        name: newSceneName.trim(),
+      });
       setNewSceneName("");
       setIsDialogOpen(false);
+      await handleSceneSelect(newScene);
     } catch (err) {
       // Error is already handled in the store
     }
-  }, [newSceneName]);
+  }, [newSceneName, handleSceneSelect]);
 
-  const handleRefresh = useCallback(() => {
-    sceneStore.fetchScenes();
+  const handleRefresh = useCallback(async () => {
+    await sceneStore.fetchScenes();
+    if (sceneStore.activeSceneId) {
+      await sceneStore.fetchSceneData(sceneStore.activeSceneId);
+    }
   }, []);
 
   return (
@@ -202,7 +202,7 @@ const SceneSelector = observer(() => {
                         {() => (
                           <SceneItem
                             scene={scene}
-                            isActive={sceneStore.activeScene?.id === scene.id}
+                            isActive={sceneStore.activeSceneId === scene.id}
                             onSelect={handleSceneSelect}
                           />
                         )}
