@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Box, Bot, Plus, Loader } from "lucide-react";
+import { Box, Bot, Plus, Loader, Rotate3D, Move3D } from "lucide-react";
 import { sceneStore } from "@/stores/scene-store";
 import { errorLoggingService } from "@/services/error-logging-service";
 import { observer } from "mobx-react";
@@ -11,6 +11,8 @@ const messages = [
   "A blank canvas for your robotic dreams",
   "Where will your imagination take you today?",
   "The future of robotics starts with a single scene",
+  "Shaping the future of robotics, one scene at a time",
+  "Your next robotics project awaits",
 ];
 
 const NoSceneSelected = observer(() => {
@@ -21,7 +23,7 @@ const NoSceneSelected = observer(() => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessage(messages[Math.floor(Math.random() * messages.length)]);
-    }, 4000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
@@ -74,14 +76,22 @@ const NoSceneSelected = observer(() => {
       >
         <motion.div
           animate={{
-            rotate: [0, 10, 0, -10, 0],
+            rotate: [0, 5, 0, -5, 0],
             scale: [1, 1.1, 1, 1.1, 1],
           }}
-          transition={{ repeat: Infinity, duration: 5 }}
+          transition={{ repeat: Infinity, duration: 10 }}
           className="relative mb-8 w-40 h-40 mx-auto"
         >
           <Box size={80} className="text-gray-500 absolute inset-0 m-auto" />
-          <Bot size={60} className="text-gray-300 absolute bottom-0 right-0" />
+          <Rotate3D
+            size={30}
+            className="text-gray-300 absolute top-10 left-0"
+          />
+          <Bot size={60} className="text-gray-300 absolute bottom-2 right-0" />
+          <Move3D
+            size={30}
+            className="text-gray-300 absolute bottom-0 left-0"
+          />
         </motion.div>
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
