@@ -1,164 +1,121 @@
-import React, { useRef, useState, useEffect } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import React, { useRef, useCallback, useEffect } from "react";
+import { useThree } from "@react-three/fiber";
 import { observer } from "mobx-react-lite";
-import { Object3D } from "three";
+import * as THREE from "three";
 import { sceneStore, objectStore, robotStore } from "@/stores/scene-store";
 import SceneObject from "./SceneObject";
 import SceneRobot from "./SceneRobot";
 import CustomTransformControls from "./CustomTransformControls";
 import SceneEnvironment from "./SceneEnvironment";
-import { IObject, IRobot } from "@/types/Interfaces";
+import { errorLoggingService } from "@/services/error-logging-service";
 
+/**
+ * SceneContent component renders the main content of the 3D scene.
+ * It observes the scene, object, and robot stores to render and update scene elements.
+ */
 const SceneContent: React.FC = observer(() => {
   const { scene } = useThree();
-  const objectsRef = useRef<{ [key: string]: Object3D }>({});
-  const [selectedObject, setSelectedObject] = useState<Object3D | null>(null);
+  const objectRefs = useRef<{ [key: string]: THREE.Group | null }>({});
 
-  useEffect(() => {
-    // Clean up objects when component unmounts
-    return () => {
-      Object.values(objectsRef.current).forEach((obj) => {
-        scene.remove(obj);
-      });
-    };
-  }, [scene]);
-
-  useFrame(() => {
-    if (sceneStore.activeScene) {
-      const sceneId = sceneStore.activeScene.id;
-      updateSceneObjects(sceneId);
-      updateSceneRobots(sceneId);
-      removeStaleObjects(sceneId);
-      updateSelectedObject();
-    }
-  });
-
-  // Function to update scene objects
-  const updateSceneObjects = (sceneId: string) => {
-    objectStore.getObjectsForScene(sceneId).forEach((obj) => {
-      updateOrCreateObject(obj, "object");
-    });
-  };
-
-  // Function to update scene robots
-  const updateSceneRobots = (sceneId: string) => {
-    robotStore.getRobotsForScene(sceneId).forEach((robot) => {
-      updateOrCreateObject(robot, "robot");
-    });
-  };
-
-  // Function to update or create an object in the scene
-  const updateOrCreateObject = (
-    item: IObject | IRobot,
-    type: "object" | "robot"
-  ) => {
-    if (!objectsRef.current[item.id]) {
-      const newObject = createObject(item, type);
-      scene.add(newObject);
-      objectsRef.current[item.id] = newObject;
-    } else {
-      updateObjectProperties(objectsRef.current[item.id], item);
-    }
-  };
-
-  // Function to create a new Object3D
-  const createObject = (
-    item: IObject | IRobot,
-    type: "object" | "robot"
-  ): Object3D => {
-    const newObject = new Object3D();
-    updateObjectProperties(newObject, item);
-    newObject.userData = { id: item.id, type };
-    return newObject;
-  };
-
-  // Function to update Object3D properties
-  const updateObjectProperties = (object: Object3D, item: IObject | IRobot) => {
-    object.position.set(...item.position);
-    object.rotation.set(...item.orientation);
-    object.scale.set(...item.scale);
-  };
-
-  // Function to remove stale objects from the scene
-  const removeStaleObjects = (sceneId: string) => {
-    Object.keys(objectsRef.current).forEach((id) => {
-      const objectExists = objectStore
-        .getObjectsForScene(sceneId)
-        .some((obj) => obj.id === id);
-      const robotExists = robotStore
-        .getRobotsForScene(sceneId)
-        .some((robot) => robot.id === id);
-      if (!objectExists && !robotExists) {
-        scene.remove(objectsRef.current[id]);
-        delete objectsRef.current[id];
-      }
-    });
-  };
-
-  // Function to update the selected object
-  const updateSelectedObject = () => {
-    const selectedId = sceneStore.activeScene?.selectedId;
-    if (selectedId && objectsRef.current[selectedId]) {
-      setSelectedObject(objectsRef.current[selectedId]);
-    } else {
-      setSelectedObject(null);
-    }
-  };
-
-  const handleObjectChange = (event: any) => {
-    const target = event.target.object;
-    const id = target.userData.id;
+  const handleObjectChange = useCallback((event: THREE.Event) => {
+    const target = event.target as THREE.Object3D;
+    const id = target.userData.id as string;
     const updates = {
       position: target.position.toArray(),
-      orientation: target.rotation.toArray(),
+      orientation: [target.rotation.x, target.rotation.y, target.rotation.z],
       scale: target.scale.toArray(),
     };
-    if (target.userData.type === "object") {
+
+    if (objectStore.items.some((obj) => obj.id === id)) {
       objectStore.updateObject(id, updates);
-    } else if (target.userData.type === "robot") {
+    } else if (robotStore.items.some((robot) => robot.id === id)) {
       robotStore.updateRobot(id, updates);
     }
-  };
+  }, []);
 
-  if (!sceneStore.activeScene) {
+  useEffect(() => {
+    if (sceneStore.selectedItem) {
+      const selectedObject = objectRefs.current[sceneStore.selectedItem.id];
+      if (selectedObject) {
+        scene.attach(selectedObject);
+      }
+    }
+    return () => {
+      if (sceneStore.selectedItem) {
+        const selectedObject = objectRefs.current[sceneStore.selectedItem.id];
+        if (selectedObject && selectedObject.parent) {
+          selectedObject.parent.attach(selectedObject);
+        }
+      }
+    };
+  }, [scene, sceneStore.selectedItem]);
+
+  useEffect(() => {
+    const loadSceneContents = async () => {
+      if (sceneStore.activeSceneId) {
+        try {
+          errorLoggingService.info(
+            `Loading contents for scene: ${sceneStore.activeSceneId}`
+          );
+          await Promise.all([
+            objectStore.fetchObjects(sceneStore.activeSceneId),
+            robotStore.fetchRobots(sceneStore.activeSceneId),
+          ]);
+          errorLoggingService.info(
+            `Scene contents loaded successfully for scene: ${sceneStore.activeSceneId}`
+          );
+        } catch (error) {
+          errorLoggingService.error(
+            `Error loading scene contents for scene: ${sceneStore.activeSceneId}`,
+            error as Error
+          );
+        }
+      }
+    };
+
+    loadSceneContents();
+  }, [sceneStore.activeSceneId]);
+
+  if (!sceneStore.activeSceneId) {
     return null;
   }
+
+  const sceneObjects = objectStore.objectsByScene(sceneStore.activeSceneId);
+  const sceneRobots = robotStore.robotsByScene(sceneStore.activeSceneId);
 
   return (
     <>
       <SceneEnvironment />
-      {Object.entries(objectsRef.current).map(([id, obj]) => {
-        const isObject = obj.userData.type === "object";
-        const item = isObject
-          ? objectStore.getItemById(id)
-          : robotStore.getItemById(id);
 
-        if (!item) return null;
-
-        return isObject ? (
-          <SceneObject
-            key={id}
-            object={item as IObject}
-            setSelectedId={(selectedId) =>
-              sceneStore.updateScene(sceneStore.activeScene!.id, { selectedId })
-            }
-          />
-        ) : (
-          <SceneRobot
-            key={id}
-            robot={item as IRobot}
-            setSelectedId={(selectedId) =>
-              sceneStore.updateScene(sceneStore.activeScene!.id, { selectedId })
-            }
-          />
-        );
-      })}
-      {selectedObject && (
-        <CustomTransformControls
-          object={selectedObject}
-          onObjectChange={handleObjectChange}
+      {sceneObjects.map((object) => (
+        <SceneObject
+          key={object.id}
+          object={object}
+          setSelectedId={(id) => sceneStore.setSelectedItem(id)}
+          ref={(el) => {
+            objectRefs.current[object.id] = el;
+          }}
         />
-      )}
+      ))}
+
+      {sceneRobots.map((robot) => (
+        <SceneRobot
+          key={robot.id}
+          robot={robot}
+          setSelectedId={(id) => sceneStore.setSelectedItem(id)}
+          ref={(el) => {
+            objectRefs.current[robot.id] = el;
+          }}
+        />
+      ))}
+
+      {sceneStore.selectedItem &&
+        objectRefs.current[sceneStore.selectedItem.id] && (
+          <CustomTransformControls
+            object={objectRefs.current[sceneStore.selectedItem.id]!}
+            onObjectChange={handleObjectChange}
+          />
+        )}
     </>
   );
 });
