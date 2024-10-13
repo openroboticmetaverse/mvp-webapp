@@ -8,9 +8,8 @@ import {
 } from "@/types/Interfaces";
 import { toast } from "@/hooks/use-toast";
 
-// Define the base URL for the API
-// TODO make it and environment variable
-const BASE_URL = "http://pi.local:8000";
+// Import the base URL from the .env file or default to http://localhost:8000
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 
 // Create an axios instance with the base URL
 const api: AxiosInstance = axios.create({
