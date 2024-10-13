@@ -7,6 +7,7 @@ import {
   IReferenceObject,
 } from "@/types/Interfaces";
 import { toast } from "@/hooks/use-toast";
+import { errorLoggingService } from "./error-logging-service";
 
 // Import the base URL from the .env file or default to http://localhost:8000
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
@@ -33,24 +34,16 @@ const handleError = (error: any): never => {
   let errorMessage = "An unexpected error occurred";
 
   if (error.response) {
-    console.error("API Error Response:", error.response.data);
-    console.error("API Error Status:", error.response.status);
-    console.error("API Error Headers:", error.response.headers);
+    errorLoggingService.error("API Error Response", error);
     errorMessage =
       error.response.data.message || `Error: ${error.response.status}`;
   } else if (error.request) {
-    console.error("API Error Request:", error.request);
+    errorLoggingService.error("API Error Request", error);
     errorMessage = "No response received from server";
   } else {
-    console.error("API Error Message:", error.message);
+    errorLoggingService.error("API Error", error);
     errorMessage = error.message;
   }
-
-  toast({
-    variant: "destructive",
-    title: "API Error",
-    description: errorMessage,
-  });
 
   throw new Error(errorMessage);
 };
