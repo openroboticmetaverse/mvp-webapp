@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Observer, observer } from "mobx-react-lite";
 import { sceneStore } from "@/stores/scene-store";
-import { errorStore } from "@/stores/error-store";
 import { IScene } from "@/types/Interfaces";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +21,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
+import { errorLoggingService } from "@/services/error-logging-service";
 
 // Memoized scene item component
 interface SceneItemProps {
@@ -89,7 +89,7 @@ const SceneSelector = observer(() => {
 
   const handleNewScene = useCallback(async () => {
     if (!newSceneName.trim()) {
-      errorStore.addError(new Error("Please enter a scene name."));
+      errorLoggingService.info("Please enter a scene name.");
       return;
     }
     try {
