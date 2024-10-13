@@ -6,7 +6,6 @@ import {
   IReferenceRobot,
   IReferenceObject,
 } from "@/types/Interfaces";
-import { toast } from "@/hooks/use-toast";
 import { errorLoggingService } from "./error-logging-service";
 
 // Import the base URL from the .env file or default to http://localhost:8000
