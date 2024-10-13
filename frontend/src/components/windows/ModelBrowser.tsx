@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import { libraryStore } from "@/stores/library-store";
+import { objectStore, robotStore } from "@/stores/scene-store";
 import { IReferenceObject, IReferenceRobot } from "@/types/Interfaces";
 import WindowCard from "@/components/ui/window-card";
 import {
@@ -21,7 +22,6 @@ import {
   Search,
   RefreshCw,
 } from "lucide-react";
-import { objectStore, robotStore } from "@/stores/scene-store";
 
 interface ModelInfo {
   id: string;
@@ -32,50 +32,58 @@ interface ModelInfo {
   reference?: string;
 }
 
-const ModelItem = React.memo(({ model }: { model: ModelInfo }) => (
-  <HoverCard key={model.id} openDelay={200} closeDelay={200}>
-    <HoverCardTrigger onClick={() => handleModelClick(model)}>
-      <div className="rounded border border-gray-300 p-1 hover:bg-white hover:bg-opacity-25 cursor-pointer w-full h-full flex flex-col items-center justify-center transition-colors duration-200">
-        <div className="text-white">{model.icon}</div>
-        <div className="text-sm mt-1 truncate text-gray-100">{model.name}</div>
-      </div>
-    </HoverCardTrigger>
-    <HoverCardContent className="w-60">
-      <WindowCard
-        description={
-          <>
-            <span>{model.description}</span>
-            <br />
-            <span className="text-xs font-mono text-green-700">
-              Model ID: <code>{model.id}</code>
-            </span>
-          </>
-        }
-        title={model.name}
-      />
-    </HoverCardContent>
-  </HoverCard>
-));
-
-const ModelGrid = React.memo(({ models }: { models: ModelInfo[] }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-    {models.map((model) => (
-      <ModelItem key={model.id} model={model} />
-    ))}
-  </div>
-));
-
-const handleModelClick = (model: ModelInfo) => {
-  if (model.type === "object") {
-    if (model.reference) {
+const ModelItem: React.FC<{ model: ModelInfo }> = React.memo(({ model }) => {
+  const handleModelClick = useCallback(() => {
+    if (model.type === "object" && model.reference) {
       objectStore.createObjectFromReference(model.reference);
-    }
-  } else if (model.type === "robot") {
-    if (model.reference) {
+    } else if (model.type === "robot" && model.reference) {
       robotStore.createRobotFromReference(model.reference);
+    } else if (model.type === "primitive") {
+      // Handle primitive shape creation here
+      console.log("Creating primitive shape:", model.name);
     }
-  }
-};
+  }, [model]);
+
+  return (
+    <HoverCard key={model.id} openDelay={200} closeDelay={200}>
+      <HoverCardTrigger asChild>
+        <div
+          onClick={handleModelClick}
+          className="rounded border border-gray-300 p-1 hover:bg-white hover:bg-opacity-25 cursor-pointer w-full h-full flex flex-col items-center justify-center transition-colors duration-200"
+        >
+          <div className="text-white">{model.icon}</div>
+          <div className="text-sm mt-1 truncate text-gray-100">
+            {model.name}
+          </div>
+        </div>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-60">
+        <WindowCard
+          description={
+            <>
+              <span>{model.description}</span>
+              <br />
+              <span className="text-xs font-mono text-green-700">
+                Model ID: <code>{model.id}</code>
+              </span>
+            </>
+          }
+          title={model.name}
+        />
+      </HoverCardContent>
+    </HoverCard>
+  );
+});
+
+const ModelGrid: React.FC<{ models: ModelInfo[] }> = React.memo(
+  ({ models }) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {models.map((model) => (
+        <ModelItem key={model.id} model={model} />
+      ))}
+    </div>
+  )
+);
 
 const ModelBrowser: React.FC = observer(() => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -128,13 +136,6 @@ const ModelBrowser: React.FC = observer(() => {
         icon: <Goal size={32} />,
         type: "primitive",
       },
-      {
-        id: "globe",
-        name: "Globe",
-        description: "A globe",
-        icon: <Globe size={32} />,
-        type: "primitive",
-      },
     ],
     []
   );
@@ -165,12 +166,15 @@ const ModelBrowser: React.FC = observer(() => {
     [libraryStore.referenceRobots]
   );
 
-  const filteredModels = (models: ModelInfo[]) =>
-    models.filter(
-      (model) =>
-        model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        model.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filterModels = useCallback(
+    (models: ModelInfo[]) =>
+      models.filter(
+        (model) =>
+          model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          model.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [searchTerm]
+  );
 
   if (libraryStore.state.status === "loading") {
     return (
@@ -187,7 +191,7 @@ const ModelBrowser: React.FC = observer(() => {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4    text-gray-100 min-h-screen">
+    <div className="flex flex-col gap-8 p-4 text-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold">Model Browser</h2>
 
       <div className="relative">
@@ -196,7 +200,7 @@ const ModelBrowser: React.FC = observer(() => {
           placeholder="Search models..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10  border-gray-700 text-gray-800"
+          className="pl-10 border-gray-700 text-gray-800"
         />
         <Search
           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-800"
@@ -208,17 +212,17 @@ const ModelBrowser: React.FC = observer(() => {
         <div className="space-y-8">
           <section>
             <h3 className="text-xl font-semibold mb-4">Primitive Shapes</h3>
-            <ModelGrid models={filteredModels(primitiveShapes)} />
+            <ModelGrid models={filterModels(primitiveShapes)} />
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4">Custom Objects</h3>
-            <ModelGrid models={filteredModels(referenceObjects)} />
+            <ModelGrid models={filterModels(referenceObjects)} />
           </section>
 
           <section>
             <h3 className="text-xl font-semibold mb-4">Robots</h3>
-            <ModelGrid models={filteredModels(referenceRobots)} />
+            <ModelGrid models={filterModels(referenceRobots)} />
           </section>
         </div>
       </ScrollArea>
