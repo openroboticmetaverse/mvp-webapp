@@ -1,18 +1,17 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { observer } from "mobx-react-lite";
 import MainScene from "./components/MainScene";
 import DefaultLayout from "@/components/default-layout";
-//import { sceneStore } from "./stores/scene-store";
+import { errorLoggingService } from "./services/error-logging-service";
+
+// Enable logging in development mode
+if (process.env.NODE_ENV === "development") {
+  errorLoggingService.enable();
+}
 
 const App: React.FC = observer(() => {
-  /*   useEffect(() => {
-    sceneStore.fetchReferenceData();
-  }, []); */
   return (
     <div className="h-screen">
-      {/* {sceneStore.selectedScene && (
-        <MainScene sceneId={String(sceneStore.selectedScene.id || 1)} />
-      )} */}
       <MainScene />
       <DefaultLayout children={undefined} />
     </div>
