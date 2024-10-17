@@ -3,6 +3,7 @@ import {
   Boxes,
   Clapperboard,
   Component,
+  ListTree,
   Package,
   Play,
   Square,
@@ -16,11 +17,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
+import { robotStore } from "@/stores/scene-store";
 
 interface MainNavProps {
   onButtonClick: (name: string) => void;
 }
 const MainNav = ({ onButtonClick }: MainNavProps) => {
+  const handleSimulationAction = (action: string) => {
+    if (action === "start") {
+      robotStore.startAllSimulations();
+    } else if (action === "stop") {
+      robotStore.stopAllSimulations();
+    }
+    onButtonClick(action);
+  };
+
   const navButtons = [
     {
       tag: "start",
@@ -38,9 +49,9 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
       icon: <Package height={35} width={35} strokeWidth={1.5} />,
     },
     {
-      tag: "delete",
-      name: "Delete",
-      icon: <Trash height={35} width={35} strokeWidth={1.5} />,
+      tag: "items-list",
+      name: "Items List",
+      icon: <ListTree height={35} width={35} strokeWidth={1.5} />,
     },
     {
       tag: "scene-selector",
@@ -72,8 +83,17 @@ const MainNav = ({ onButtonClick }: MainNavProps) => {
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div onClick={() => onButtonClick(tag)}>
-                        <ToggleGroupItem value={tag}>{icon}</ToggleGroupItem>
+                      <div onClick={() => handleSimulationAction(tag)}>
+                        <ToggleGroupItem
+                          value={tag}
+                          /* disabled={
+                            tag === "start"
+                              ? robotStore.allSimulationsRunning
+                              : !robotStore.allSimulationsRunning
+                          } */
+                        >
+                          {icon}
+                        </ToggleGroupItem>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="">{name}</TooltipContent>
