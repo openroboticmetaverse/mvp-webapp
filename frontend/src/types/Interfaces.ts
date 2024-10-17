@@ -37,6 +37,7 @@ export interface IObject extends IAbstractObject {
 export interface IRobot extends IAbstractObject {
   robot_reference: string; // FK
   joint_angles: number[]; // List of Double
+  sim_websocket_url: string;
 }
 
 /**
@@ -47,7 +48,7 @@ export interface IRobot extends IAbstractObject {
 export interface IAbstractReference {
   id: string; // PK
   name: string;
-  file: File;
+  file: string | File | Blob;
   file_type: string;
   description: string;
   created_at: string;
@@ -57,6 +58,10 @@ export interface IAbstractReference {
 // ReferenceRobot interface (extends IAbstractReference)
 export interface IReferenceRobot extends IAbstractReference {
   num_joints: number;
+  joint_names: {
+    axes: ("rx" | "ry" | "rz" | "")[];
+    links: string[]; // Temporarily changed the format, currently not the same as backend, as we do not explicitly store the link/axis names
+  };
 }
 
 export interface IReferenceObject extends IAbstractReference {
