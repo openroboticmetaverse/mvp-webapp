@@ -30,6 +30,19 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
     }
   }, [windowTag]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setContent(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <>
       {content && (

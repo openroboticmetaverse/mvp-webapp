@@ -74,11 +74,22 @@ const TopBar: React.FC = observer(() => {
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-10 backdrop-blur-sm shadow-md text-white rounded-full px-4 py-2 flex items-center space-x-4 z-10">
-      <span className="text-sm font-semibold truncate max-w-[200px]">
-        {sceneStore.activeScene
-          ? sceneStore.activeScene.name
-          : "No Scene Selected"}
-      </span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-sm font-semibold truncate max-w-[160px]">
+              {sceneStore.activeScene
+                ? sceneStore.activeScene.name
+                : "No Scene Selected"}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{sceneStore.activeScene.name}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <div className="w-px h-4 bg-gray-300" />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -93,6 +104,8 @@ const TopBar: React.FC = observer(() => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
+      <div className="w-px h-4 bg-gray-300" />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -105,6 +118,8 @@ const TopBar: React.FC = observer(() => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
+      <div className="w-px h-4 bg-gray-300" />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -138,7 +153,7 @@ const TopBar: React.FC = observer(() => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      {/* Add Undo and Redo buttons if you implement that functionality */}
+      {/* Add Undo and Redo buttons if you implement that functionality
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -146,7 +161,6 @@ const TopBar: React.FC = observer(() => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                /* Implement undo functionality */
               }}
               disabled={true} // Enable when undo is implemented
               className="p-1"
@@ -166,7 +180,6 @@ const TopBar: React.FC = observer(() => {
               variant="ghost"
               size="sm"
               onClick={() => {
-                /* Implement redo functionality */
               }}
               disabled={true} // Enable when redo is implemented
               className="p-1"
@@ -176,6 +189,20 @@ const TopBar: React.FC = observer(() => {
           </TooltipTrigger>
           <TooltipContent>
             <p>Redo</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider> */}
+
+      <div className="w-px h-4 bg-gray-300" />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-sm font-semibold text-gray-100">
+              mvp v0.6
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Version</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
