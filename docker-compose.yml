@@ -1,9 +1,9 @@
 services:
-  mvp_frontend_react:
-    container_name: mvp_frontend_react
+  mvp_frontend:
+    container_name: mvp_frontend
     image: node:lts
     working_dir: /var/www/html/app/
-    entrypoint: /bin/bash
+    entrypoint: /bin/bash -c "yarn && yarn dev --host"
     ports:
       - "5173:5173"
     volumes:
