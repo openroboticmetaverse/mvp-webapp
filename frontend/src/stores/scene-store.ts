@@ -10,6 +10,10 @@ import { IScene, IObject, IRobot } from "../types/Interfaces";
 import { libraryStore } from "./library-store";
 import { generateUniqueId } from "@/utils/idGenerator";
 import { errorLoggingService } from "../services/error-logging-service";
+import {
+  webSocketManager,
+  WebSocketStatus,
+} from "@/services/websocket-manager";
 
 /**
  * Base store class with pending changes functionality and verbose logging.
@@ -277,7 +281,7 @@ class SceneStore extends BasePendingStore<IScene> {
    * The currently active scene
    */
   @computed get activeScene() {
-    return this.scenes.find((scene) => scene.id === this.activeSceneId);
+    return this.items.find((scene) => scene.id === this.activeSceneId);
   }
 
   /**
@@ -338,6 +342,17 @@ class SceneStore extends BasePendingStore<IScene> {
   setSelectedItem(itemId: string | null) {
     this.selectedItemId = itemId;
     errorLoggingService.debug(`Selected item set to: ${itemId}`);
+  }
+
+  @action
+  /**
+   * Clears the currently selected item.
+   */
+  clearSelectedItem() {
+    if (this.selectedItemId !== null) {
+      this.selectedItemId = null;
+      errorLoggingService.debug(`Selected item cleared`);
+    }
   }
 
   /**
@@ -401,6 +416,7 @@ class SceneStore extends BasePendingStore<IScene> {
       const newScene = await sceneManagerApi.createScene(sceneData);
       runInAction(() => {
         this.items.push(newScene);
+        this.setActiveScene(newScene.id); // Set the active scene immediately
       });
       errorLoggingService.info("New scene created successfully", newScene);
       return newScene;
@@ -588,7 +604,7 @@ class ObjectStore extends BasePendingStore<IObject> {
     referenceId: string
   ): Promise<IObject | undefined> {
     errorLoggingService.info(`Creating object from reference: ${referenceId}`);
-    if (!sceneStore.activeScene) {
+    if (!sceneStore.activeSceneId) {
       errorLoggingService.error("No active scene to add object to");
       return;
     }
@@ -605,7 +621,7 @@ class ObjectStore extends BasePendingStore<IObject> {
       id: generateUniqueId(),
       name: referenceObject.name,
       description: referenceObject.description,
-      scene_id: sceneStore.activeScene.id,
+      scene_id: sceneStore.activeSceneId,
       position: [0, 0, 0],
       orientation: [0, 0, 0],
       scale: [1, 1, 1],
@@ -677,6 +693,8 @@ class ObjectStore extends BasePendingStore<IObject> {
  * Store for managing robots
  */
 class RobotStore extends BasePendingStore<IRobot> {
+  @observable websocketStatus: Map<string, string> = new Map();
+
   /**
    * Creates a new instance of the store
    */
@@ -746,7 +764,10 @@ class RobotStore extends BasePendingStore<IRobot> {
   @computed
   get robotsByScene() {
     return (sceneId: string): IRobot[] => {
-      const robots = this.items
+      const robots = [
+        ...this.items,
+        ...Array.from(this.pendingCreations.values()),
+      ]
         .filter((robot) => robot.scene_id === sceneId)
         .map((robot) => this.getItemWithPendingChanges(robot.id)!);
       errorLoggingService.debug(
@@ -755,7 +776,6 @@ class RobotStore extends BasePendingStore<IRobot> {
       return robots;
     };
   }
-
   /**
    * Creates a new robot from a reference robot
    * @param referenceId The id of the reference robot
@@ -787,6 +807,7 @@ class RobotStore extends BasePendingStore<IRobot> {
       orientation: [0, 0, 0],
       scale: [1, 1, 1],
       robot_reference: referenceId,
+      sim_websocket_url: "", // TODO: Figure out how to get this from user?
       joint_angles: [0],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -847,6 +868,84 @@ class RobotStore extends BasePendingStore<IRobot> {
     errorLoggingService.info(`Deleting robot: ${id}`);
     await sceneManagerApi.deleteRobot(id);
     errorLoggingService.info(`Robot deleted successfully: ${id}`);
+  }
+
+  @action
+  initializeWebSockets() {
+    this.items.forEach((robot) => {
+      if (robot.sim_websocket_url) {
+        webSocketManager.createConnection(robot.id, robot.sim_websocket_url);
+        webSocketManager.setOnMessageCallback(robot.id, (data) =>
+          this.handleWebSocketMessage(robot.id, data)
+        );
+      }
+    });
+  }
+
+  @action
+  startAllSimulations() {
+    webSocketManager.connectAll();
+    this.updateAllWebSocketStatus();
+  }
+
+  @action
+  stopAllSimulations() {
+    webSocketManager.disconnectAll();
+    this.updateAllWebSocketStatus();
+  }
+
+  @action
+  private updateAllWebSocketStatus() {
+    this.items.forEach((robot) => {
+      if (robot.sim_websocket_url) {
+        this.websocketStatus.set(
+          robot.id,
+          webSocketManager.getStatus(robot.id)
+        );
+      }
+    });
+  }
+
+  @action
+  private handleWebSocketMessage(robotId: string, data: any) {
+    // Update robot state based on received data
+    const robot = this.items.find((r) => r.id === robotId);
+    if (robot) {
+      // Update robot properties based on the received data
+      // robot.position = data.position;
+      // robot.orientation = data.orientation;
+      // This will depend on the structure of our WebSocket messages
+      robot.joint_angles = data.joint_angles; // TODO Check if this is correct
+    }
+  }
+
+  @computed
+  get allSimulationsRunning() {
+    return Array.from(this.websocketStatus.values()).every(
+      (status) => status === "connected"
+    );
+  }
+
+  @action
+  updateWebSocketStatus(robotId: string, status: WebSocketStatus) {
+    this.websocketStatus.set(robotId, status);
+    errorLoggingService.info(
+      `WebSocket status updated in store for robot ${robotId}: ${status}`
+    );
+  }
+
+  @computed
+  get overallWebSocketStatus(): WebSocketStatus {
+    const statuses = Array.from(this.websocketStatus.values());
+    errorLoggingService.info(
+      `Current WebSocket statuses: ${JSON.stringify(Object.fromEntries(this.websocketStatus))}`
+    );
+
+    if (statuses.length === 0) return "disconnected";
+    if (statuses.every((status) => status === "connected")) return "connected";
+    if (statuses.some((status) => status === "error")) return "error";
+    if (statuses.some((status) => status === "connecting")) return "connecting";
+    return "disconnected";
   }
 }
 
