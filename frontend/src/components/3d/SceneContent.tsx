@@ -22,7 +22,11 @@ const SceneContent: React.FC = observer(() => {
     const id = target.userData.id as string;
     const updates = {
       position: target.position.toArray(),
-      orientation: [target.rotation.x, target.rotation.y, target.rotation.z],
+      orientation: [
+        target.rotation.x,
+        target.rotation.y,
+        target.rotation.z,
+      ] as [number, number, number],
       scale: target.scale.toArray(),
     };
 
@@ -58,8 +62,8 @@ const SceneContent: React.FC = observer(() => {
             `Loading contents for scene: ${sceneStore.activeSceneId}`
           );
           await Promise.all([
-            objectStore.fetchObjects(sceneStore.activeSceneId),
-            robotStore.fetchRobots(sceneStore.activeSceneId),
+            objectStore.fetchObjects(),
+            robotStore.fetchRobots(),
           ]);
           errorLoggingService.info(
             `Scene contents loaded successfully for scene: ${sceneStore.activeSceneId}`

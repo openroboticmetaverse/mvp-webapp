@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { TransformControls as DreiTransformControls } from "@react-three/drei";
 import { Object3D } from "three";
 import { errorLoggingService } from "@/services/error-logging-service";
@@ -8,61 +8,69 @@ interface CustomTransformControlsProps {
   onObjectChange: (event: any) => void;
 }
 
-const CustomTransformControls: React.FC<CustomTransformControlsProps> = ({
-  object,
-  onObjectChange,
-}) => {
-  const controlsRef = useRef<any>(null);
+const CustomTransformControls: React.FC<CustomTransformControlsProps> =
+  React.memo(({ object, onObjectChange }) => {
+    const controlsRef = useRef<any>(null);
+    const [mode, setMode] = useState<"translate" | "rotate" | "scale">(
+      "translate"
+    );
 
-  useEffect(() => {
-    errorLoggingService.debug("CustomTransformControls mounted", {
-      objectId: object?.userData?.id,
-      hasObject: !!object,
-    });
-
-    return () => {
-      errorLoggingService.debug("CustomTransformControls unmounted", {
+    useEffect(() => {
+      errorLoggingService.debug("CustomTransformControls mounted", {
         objectId: object?.userData?.id,
+        hasObject: !!object,
       });
-    };
-  }, [object]);
 
-  useEffect(() => {
-    if (controlsRef.current) {
-      const controls = controlsRef.current;
-      controls.addEventListener(
-        "dragging-changed",
-        (event: { value: boolean }) => {
-          errorLoggingService.debug("Transform controls dragging changed", {
-            isDragging: event.value,
-            objectId: object?.userData?.id,
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "m" || event.key === "M") {
+          setMode((prevMode) => {
+            switch (prevMode) {
+              case "translate":
+                return "rotate";
+              case "rotate":
+                return "scale";
+              case "scale":
+                return "translate";
+            }
           });
         }
-      );
-    }
-  }, [object]);
+      };
 
-  if (!object) {
-    errorLoggingService.warn("CustomTransformControls rendered without object");
-    return null;
-  }
+      window.addEventListener("keydown", handleKeyDown);
 
-  return (
-    <DreiTransformControls
-      ref={controlsRef}
-      object={object}
-      onObjectChange={(event) => {
-        errorLoggingService.debug("Transform controls object changed", {
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+        errorLoggingService.debug("CustomTransformControls unmounted", {
           objectId: object?.userData?.id,
-          position: object.position.toArray(),
-          rotation: object.rotation.toArray(),
-          scale: object.scale.toArray(),
         });
-        onObjectChange(event);
-      }}
-      size={0.7}
-    />
-  );
-};
+      };
+    }, [object]);
+
+    const handleChange = useCallback(
+      (event: any) => {
+        if (event.target !== controlsRef.current) {
+          onObjectChange(event);
+        }
+      },
+      [onObjectChange]
+    );
+
+    if (!object) {
+      errorLoggingService.warn(
+        "CustomTransformControls rendered without object"
+      );
+      return null;
+    }
+
+    return (
+      <DreiTransformControls
+        ref={controlsRef}
+        object={object}
+        onObjectChange={handleChange}
+        size={0.7}
+        mode={mode}
+      />
+    );
+  });
 
 export default CustomTransformControls;

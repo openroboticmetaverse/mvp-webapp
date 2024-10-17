@@ -4,10 +4,11 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { ThreeEvent, useLoader, useThree } from "@react-three/fiber";
+import { ThreeEvent, useLoader } from "@react-three/fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { IObject } from "@/types/Interfaces";
 import { libraryStore } from "@/stores/library-store";
 import * as THREE from "three";
@@ -26,7 +27,6 @@ function hasId(obj: any): obj is { id: string | number } {
 
 const SceneObject = forwardRef<THREE.Group, SceneObjectProps>(
   ({ object, setSelectedId }, ref) => {
-    const { scene } = useThree();
     const groupRef = React.useRef<THREE.Group>(null);
 
     console.log("SceneObject props:", object);
@@ -154,8 +154,37 @@ const OBJModel: React.FC<{ file: string | File | Blob }> = ({ file }) => {
   return <primitive object={obj} />;
 };
 
-const GLTFModel: React.FC<{ file: string | File | Blob }> = ({ file }) => {
+/* const GLTFModel: React.FC<{ file: string | File | Blob }> = ({ file }) => {
   const gltf = useLoader(GLTFLoader, getFileUrl(file));
+  return <primitive object={gltf.scene} />;
+}; */
+
+/**
+ * GLTFModel component that loads and renders a GLTF/GLB 3D model using the GLTFLoader.
+ * It supports Draco compression by setting a DRACOLoader on the GLTFLoader instance.
+ *
+ * @param {Object} props - The properties for the GLTFModel component.
+ * @param {string | File | Blob} props.file - The file path or file object representing the GLTF/GLB model to be loaded.
+ *
+ * @returns A React component that renders the 3D model as a three.js primitive object.
+ */
+const GLTFModel: React.FC<{ file: string | File | Blob }> = ({ file }) => {
+  const gltfLoader = useMemo(() => {
+    const loader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath(
+      "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
+    );
+    loader.setDRACOLoader(dracoLoader);
+    return loader;
+  }, []);
+
+  const gltf = useLoader(GLTFLoader, getFileUrl(file), (loader) => {
+    if (loader instanceof GLTFLoader && gltfLoader.dracoLoader) {
+      loader.setDRACOLoader(gltfLoader.dracoLoader);
+    }
+  });
+
   return <primitive object={gltf.scene} />;
 };
 
