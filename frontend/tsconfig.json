@@ -19,7 +19,8 @@
     "noUnusedLocals": false, // Disables errors on unused local variables
     "noUnusedParameters": false, // Disables errors on unused parameters in functions
     "experimentalDecorators": true,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "sourceMap": true
   },
   "references": [
     {
