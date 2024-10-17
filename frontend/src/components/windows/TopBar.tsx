@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { Save, Undo, Redo } from "lucide-react";
+import { Save, Undo, Redo, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sceneStore, objectStore, robotStore } from "@/stores/scene-store";
 import {
@@ -43,6 +43,34 @@ const TopBar: React.FC = observer(() => {
   // Get the total number of objects and robots in the current scene
   const objectCount = sceneStore.currentSceneObjects.length;
   const robotCount = sceneStore.currentSceneRobots.length;
+
+  const getWebSocketStatusColor = () => {
+    switch (robotStore.overallWebSocketStatus) {
+      case "connected":
+        return "text-green-500";
+      case "connecting":
+        return "text-yellow-500";
+      case "error":
+        return "text-red-500";
+      case "disconnected":
+      default:
+        return "text-gray-500";
+    }
+  };
+
+  const getWebSocketStatusText = () => {
+    switch (robotStore.overallWebSocketStatus) {
+      case "connected":
+        return "All WebSockets connected";
+      case "connecting":
+        return "WebSockets connecting";
+      case "error":
+        return "WebSocket error";
+      case "disconnected":
+      default:
+        return "WebSockets disconnected";
+    }
+  };
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-10 backdrop-blur-sm shadow-md text-white rounded-full px-4 py-2 flex items-center space-x-4 z-10">
@@ -92,6 +120,21 @@ const TopBar: React.FC = observer(() => {
           </TooltipTrigger>
           <TooltipContent>
             <p>Save All Changes</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className={`${getWebSocketStatusColor()} transition-colors duration-300`}
+            >
+              <Wifi size={20} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{getWebSocketStatusText()}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
