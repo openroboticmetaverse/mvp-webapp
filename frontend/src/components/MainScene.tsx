@@ -28,7 +28,7 @@ const MainScene: React.FC = observer(() => {
         title: "Error",
         description: errorMessage,
       });
-    } else if (
+    } /* else if (
       sceneStore.state.status === "success" &&
       !sceneStore.activeScene
     ) {
@@ -37,13 +37,21 @@ const MainScene: React.FC = observer(() => {
         title: "No Scene Selected",
         description: "Please select a scene from the Scene Selector.",
       });
-    } else if (
+    }  */ else if (
       sceneStore.state.status === "success" &&
       sceneStore.activeScene
     ) {
       errorLoggingService.info(`Scene loaded: ${sceneStore.activeScene.name}`);
     }
   }, [sceneStore.state.status, sceneStore.activeScene, toast]);
+
+  /**
+   * Clear the currently selected item in the scene store when the user clicks anywhere on the canvas.
+   * This is used to handle the case where the user clicks outside of any selectable objects.
+   */
+  const onClear = () => {
+    sceneStore.clearSelectedItem();
+  };
 
   /**
    * Render appropriate content based on the current state of the scene store
@@ -64,6 +72,7 @@ const MainScene: React.FC = observer(() => {
               onCreated={() =>
                 errorLoggingService.info("Canvas created successfully")
               }
+              onPointerMissed={onClear}
             >
               <SceneContent />
             </Canvas>
