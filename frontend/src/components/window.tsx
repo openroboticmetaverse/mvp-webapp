@@ -1,7 +1,7 @@
 import { useState, useEffect, ReactElement } from "react";
 import ModelBrowser from "@/components/windows/ModelBrowser";
-import DeleteRobot from "@/components/windows/delete-robot";
 import SceneSelector from "./windows/scene-selector";
+import SceneItemsList from "@/components/windows/SceneItemsList";
 
 interface WindowProps {
   position: "left" | "right";
@@ -19,8 +19,8 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
       case "robot-browser":
         setContent(<ModelBrowser />);
         break;
-      case "delete":
-        setContent(<DeleteRobot />);
+      case "items-list":
+        setContent(<SceneItemsList />);
         break;
       case "scene-selector":
         setContent(<SceneSelector />);
