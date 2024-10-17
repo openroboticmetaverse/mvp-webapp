@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  ContactShadows,
+  Environment,
   GizmoHelper,
   GizmoViewport,
   Grid,
@@ -31,7 +33,18 @@ const SceneEnvironment: React.FC = () => {
     <>
       <OrbitControls makeDefault />
       <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
+      <directionalLight position={[10, 100, 10]} intensity={0.9} castShadow />
+      <Environment preset="night" ground={{ height: 10, radius: 40 }} />
+
+      {/* Contact shadows for grounding objects */}
+      <ContactShadows
+        opacity={0.5}
+        scale={10}
+        blur={1}
+        far={10}
+        resolution={256}
+        color="#000000"
+      />
       <Grid
         args={[10, 100]}
         infiniteGrid
@@ -41,6 +54,7 @@ const SceneEnvironment: React.FC = () => {
         sectionSize={10}
         cellSize={1}
         fadeStrength={2}
+        receiveShadow
       />
       <StatsGl />
       <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
