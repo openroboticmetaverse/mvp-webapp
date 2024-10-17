@@ -33,7 +33,8 @@ const NoSceneSelected = observer(() => {
     setError(null);
     try {
       const currentDate = new Date();
-      const sceneName = `New Scene - ${currentDate.toLocaleString()}`;
+      //const sceneName = `New Scene - ${currentDate.toLocaleString()}`;
+      const sceneName = `New Scene - ${currentDate.getFullYear()}${String(currentDate.getMonth() + 1).padStart(2, "0")}${String(currentDate.getDate()).padStart(2, "0")} - ${String(currentDate.getHours()).padStart(2, "0")}${String(currentDate.getMinutes()).padStart(2, "0")}${String(currentDate.getSeconds()).padStart(2, "0")}`;
       await sceneStore.fetchScenes();
 
       const newScene = await sceneStore.createScene({
