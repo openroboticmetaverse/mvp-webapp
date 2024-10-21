@@ -83,9 +83,7 @@ const TopBar: React.FC = observer(() => {
                 : "No Scene Selected"}
             </span>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>{sceneStore.activeScene.name}</p>
-          </TooltipContent>
+          <TooltipContent></TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
