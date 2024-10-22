@@ -8,6 +8,7 @@ import WebGLNotSupported from "./ui/WebGLNotSupported";
 import { useToast } from "@/hooks/use-toast";
 import { errorLoggingService } from "@/services/error-logging-service";
 import NoSceneSelected from "./ui/NoSceneSelected";
+import DemoScene from "./3d/DemoScene";
 
 /**
  * MainScene component handles the rendering of the 3D scene and various states.
@@ -74,7 +75,7 @@ const MainScene: React.FC = observer(() => {
               }
               onPointerMissed={onClear}
             >
-              <SceneContent />
+              {/* <SceneContent /> */}
             </Canvas>
           );
         }
