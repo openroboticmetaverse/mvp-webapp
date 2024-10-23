@@ -9,6 +9,7 @@ import PropTable from "./GLTFProp";
 import GLTFProp from "./GLTFProp";
 import URDFRobot from "./URDFRobot";
 import WindTurbine from "./WindTurbine";
+import { IndustrialScene } from "./IndustrialScene";
 
 const DemoScene: React.FC = () => {
   // Optional custom joint configuration
@@ -65,7 +66,7 @@ const DemoScene: React.FC = () => {
     <>
       {/* MCXRobot with required props */}
       <Canvas
-        camera={{ position: [20, 7, 12], fov: 60, near: 0.1, far: 200 }}
+        camera={{ position: [-10, 7, 1], fov: 50, near: 0.1, far: 200 }}
         style={{ background: "#242625" }}
         className="m-0 w-full h-full absolute"
         dpr={[0.8, 2]}
@@ -161,11 +162,20 @@ const DemoScene: React.FC = () => {
           modelUrl="/models/apple-low-poly.gltf"
           position={[-4.5, 0, -5]}
         />
+        <GLTFProp
+          modelUrl="/models/apple-low-poly.gltf"
+          position={[-6, 0, -3]}
+        />
 
         <GLTFProp
           modelUrl="/models/cybertruck.gltf"
-          position={[3, 0, -7]}
-          rotation={[0, -1, 0]}
+          position={[6, 0, -7]}
+          rotation={[0, -0.4, 0]}
+        />
+        <GLTFProp
+          modelUrl="/models/industrial-scene.glb"
+          position={[2, 0, -28]}
+          rotation={[0, 0.7, 0]}
         />
       </Canvas>
     </>

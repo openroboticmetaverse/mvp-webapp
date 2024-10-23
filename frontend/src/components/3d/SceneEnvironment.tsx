@@ -32,9 +32,9 @@ const SceneEnvironment: React.FC = () => {
   return (
     <>
       <OrbitControls makeDefault />
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.65} />
       <directionalLight position={[10, 100, 10]} intensity={0.9} castShadow />
-      <Environment preset="night" ground={{ height: 10, radius: 40 }} />
+      <Environment preset="night" ground={{ height: 10, radius: 100 }} />
 
       {/* Contact shadows for grounding objects */}
       <ContactShadows
