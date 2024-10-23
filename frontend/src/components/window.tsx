@@ -56,6 +56,25 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
           <div className="p-4 h-full overflow-hidden flex flex-col">
             {content}
           </div>
+          <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-3xl z-20 flex items-center justify-center rounded">
+            <div className="text-center">
+              <svg
+                className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
+                ></path>
+              </svg>
+              <p className="text-gray-200 text-3xl">Disabled in Demo mode</p>
+            </div>
+          </div>
         </div>
       )}
     </>
