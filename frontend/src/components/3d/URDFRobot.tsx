@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useMemo, Suspense } from "react";
-import { useThree } from "@react-three/fiber";
+import React, { useRef, useEffect, useMemo, Suspense, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import { LoaderUtils } from "three";
 import { XacroLoader } from "xacro-parser";
 import URDFLoader from "urdf-loader";
+import ROSLIB from "roslib";
 import * as THREE from "three";
 import { errorLoggingService } from "@/services/error-logging-service";
 
@@ -16,8 +17,6 @@ const ROBOT_PACKAGES: { [key: string]: string } = {
     "https://raw.githubusercontent.com/openroboticmetaverse/robot-description/main/packages/franka_description",
   sawyer:
     "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/sawyer_description",
-  robotiq_2f_85_gripper_visualization:
-    "https://raw.githubusercontent.com/openroboticmetaverse/mvp-test/master/assets/models/robotiq_3f_gripper_visualization",
 };
 
 /**
@@ -31,6 +30,74 @@ const ROBOT_URLS: { [key: string]: string } = {
 };
 
 /**
+ * ROS configuration interface
+ */
+interface ROSConfig {
+  url: string;
+  port: string;
+  topicName?: string;
+  messageType?: string;
+}
+
+/**
+ * Joint mapping configurations for different robot types
+ */
+const JOINT_MAPPINGS: Record<string, Record<string, string>> = {
+  sawyer: {
+    // Map from Panda joints to Sawyer joints
+    panda_joint0: "right_j0",
+    panda_joint1: "right_j1",
+    panda_joint2: "right_j2",
+    panda_joint3: "right_j3",
+    panda_joint4: "right_j4",
+    panda_joint5: "right_j5",
+    panda_joint6: "right_j6",
+  },
+  panda: {
+    // Identity mapping for Panda
+    panda_joint0: "panda_joint0",
+    panda_joint1: "panda_joint1",
+    panda_joint2: "panda_joint2",
+    panda_joint3: "panda_joint3",
+    panda_joint4: "panda_joint4",
+    panda_joint5: "panda_joint5",
+    panda_joint6: "panda_joint6",
+  },
+};
+
+/**
+ * Map joint names based on robot type
+ */
+const mapJointNames = (
+  jointStates: Record<string, number>,
+  robotType: string
+): Record<string, number> => {
+  const mapping = JOINT_MAPPINGS[robotType];
+  if (!mapping) return jointStates;
+
+  const mappedStates: Record<string, number> = {};
+
+  Object.entries(jointStates).forEach(([joint, value]) => {
+    // Find the corresponding mapped joint name
+    const mappedJoint = Object.entries(mapping).find(
+      ([from, to]) => to === joint || from === joint
+    );
+
+    if (mappedJoint) {
+      // Use the appropriate joint name based on robot type
+      const targetJoint =
+        robotType === "sawyer" ? mappedJoint[1] : mappedJoint[0];
+      mappedStates[targetJoint] = value;
+    } else {
+      // Keep original joint name if no mapping exists
+      mappedStates[joint] = value;
+    }
+  });
+
+  return mappedStates;
+};
+
+/**
  * Props for URDFRobot component
  */
 interface URDFRobotProps {
@@ -40,10 +107,21 @@ interface URDFRobotProps {
   scale?: [number, number, number];
   id?: string;
   initialJointStates?: Record<string, number>;
+  rosConfig?: ROSConfig;
 }
 
 /**
- * Fallback component shown while the model is loading
+ * Joint state message interface
+ */
+interface JointStateMessage {
+  name: string[];
+  position: number[];
+  velocity: number[];
+  effort: number[];
+}
+
+/**
+ * Fallback component shown while loading
  */
 const LoadingFallback: React.FC = React.memo(() => (
   <mesh>
@@ -53,14 +131,26 @@ const LoadingFallback: React.FC = React.memo(() => (
 ));
 
 /**
- * Error boundary fallback component
+ * Error fallback component
  */
 const ErrorFallback: React.FC = React.memo(() => (
   <mesh>
-    <boxGeometry args={[0.5, 0.5, 0.5]} />
+    <sphereGeometry args={[0.5, 16]} />
     <meshStandardMaterial color="red" />
   </mesh>
 ));
+
+/**
+ * Connection status indicator
+ */
+const ConnectionIndicator: React.FC<{ isConnected: boolean }> = React.memo(
+  ({ isConnected }) => (
+    <mesh position={[0, 2, 0]} scale={0.2}>
+      <sphereGeometry args={[1, 16, 16]} />
+      <meshStandardMaterial color={isConnected ? "#00ff00" : "#ff0000"} />
+    </mesh>
+  )
+);
 
 /**
  * Create configured XacroLoader
@@ -91,16 +181,107 @@ const createURDFLoader = (workingPath: string) => {
 };
 
 /**
- * Robot model component that handles the URDF model
+ * ROS Connection handler component
+ */
+const ROSConnection: React.FC<{
+  config: ROSConfig;
+  onJointStates: (states: Record<string, number>) => void;
+  onConnectionChange: (connected: boolean) => void;
+  id: string;
+}> = React.memo(({ config, onJointStates, onConnectionChange, id }) => {
+  useEffect(() => {
+    const ros = new ROSLIB.Ros({
+      url: `ws://${config.url}:${config.port}`,
+    });
+
+    let subscriber: ROSLIB.Topic | null = null;
+
+    ros.on("connection", () => {
+      errorLoggingService.info("Connected to ROS bridge", { id });
+      onConnectionChange(true);
+
+      subscriber = new ROSLIB.Topic({
+        ros: ros,
+        name: config.topicName || "/joint_states",
+        messageType: config.messageType || "sensor_msgs/JointState",
+      });
+
+      subscriber.subscribe((message: JointStateMessage) => {
+        try {
+          const jointStates: Record<string, number> = {};
+          message.name.forEach((name, index) => {
+            jointStates[name] = message.position[index];
+          });
+          onJointStates(jointStates);
+        } catch (error) {
+          errorLoggingService.error(
+            "Error processing joint state message",
+            error as Error,
+            { id, message }
+          );
+        }
+      });
+    });
+
+    ros.on("error", (error) => {
+      errorLoggingService.error("ROS connection error", error, {
+        id,
+        url: config.url,
+        port: config.port,
+      });
+      onConnectionChange(false);
+    });
+
+    ros.on("close", () => {
+      errorLoggingService.info("ROS connection closed", { id });
+      onConnectionChange(false);
+    });
+
+    return () => {
+      if (subscriber) {
+        subscriber.unsubscribe();
+      }
+      ros.close();
+    };
+  }, [config, onJointStates, onConnectionChange, id]);
+
+  return null;
+});
+
+/**
+ * Robot model component that handles the URDF model and joint animations
  */
 const RobotModel: React.FC<{
   robotUrl: string;
   initialJointStates?: Record<string, number>;
+  jointStates: Record<string, number>;
+  type: string;
   id: string;
-}> = React.memo(({ robotUrl, initialJointStates, id }) => {
+}> = React.memo(({ robotUrl, initialJointStates, jointStates, type, id }) => {
   const robotRef = useRef<THREE.Object3D | null>(null);
   const groupRef = useRef<THREE.Group>(null);
 
+  // Map joint states based on robot type
+  const mappedJointStates = useMemo(
+    () => mapJointNames(jointStates, type),
+    [jointStates, type]
+  );
+
+  // Apply mapped joint states in animation frame
+  useFrame(() => {
+    if (robotRef.current) {
+      Object.entries(mappedJointStates).forEach(([joint, value]) => {
+        try {
+          (robotRef.current as any).setJointValue(joint, value);
+        } catch (error) {
+          // Don't log every frame error
+          console.debug(`Joint not found: ${joint}`);
+        }
+      });
+    }
+  });
+
+  // Load the robot with mapped initial joint states
   useEffect(() => {
     const loadRobot = async () => {
       try {
@@ -121,26 +302,30 @@ const RobotModel: React.FC<{
               robot.rotation.set(-Math.PI / 2, 0, 0);
               robot.scale.set(2, 2, 2);
 
-              // Apply initial joint states if provided
+              // Apply mapped initial joint states
               if (initialJointStates) {
-                Object.entries(initialJointStates).forEach(([joint, value]) => {
-                  try {
-                    robot.setJointValue(joint, value);
-                  } catch (error) {
-                    errorLoggingService.error(
-                      `Failed to set joint value`,
-                      error as Error,
-                      { id, joint, value }
-                    );
+                const mappedInitialStates = mapJointNames(
+                  initialJointStates,
+                  type
+                );
+                Object.entries(mappedInitialStates).forEach(
+                  ([joint, value]) => {
+                    try {
+                      robot.setJointValue(joint, value);
+                    } catch (error) {
+                      errorLoggingService.error(
+                        `Failed to set initial joint value`,
+                        error as Error,
+                        { id, joint, value, robotType: type }
+                      );
+                    }
                   }
-                });
+                );
               }
 
               robotRef.current = robot;
 
-              // Instead of adding to scene, we add to our group
-              if (groupRef.current && robot) {
-                // Clear any existing robots
+              if (groupRef.current) {
                 while (groupRef.current.children.length > 0) {
                   groupRef.current.remove(groupRef.current.children[0]);
                 }
@@ -149,7 +334,7 @@ const RobotModel: React.FC<{
 
               errorLoggingService.info(`Robot loaded successfully`, {
                 id,
-                robotType: id,
+                robotType: type,
                 jointCount: Object.keys(robot.joints).length,
               });
             } catch (error) {
@@ -166,8 +351,11 @@ const RobotModel: React.FC<{
               progress: Math.round(progress * 100),
             });
           },
-          (error: Error) => {
-            errorLoggingService.error(`Failed to load Xacro`, error as Error);
+          (error) => {
+            errorLoggingService.error(`Failed to load Xacro`, error, {
+              id,
+              robotUrl,
+            });
           }
         );
       } catch (error) {
@@ -189,16 +377,14 @@ const RobotModel: React.FC<{
         while (groupRef.current.children.length > 0) {
           groupRef.current.remove(groupRef.current.children[0]);
         }
-        errorLoggingService.debug(`Robot removed from group`, { id });
       }
     };
-  }, [robotUrl, id, initialJointStates]);
+  }, [robotUrl, id, initialJointStates, type]);
 
   return <group ref={groupRef} />;
 });
-
 /**
- * URDFRobot component for loading and displaying URDF robot models
+ * Main URDFRobot component
  */
 const URDFRobot: React.FC<URDFRobotProps> = ({
   type,
@@ -207,8 +393,13 @@ const URDFRobot: React.FC<URDFRobotProps> = ({
   scale = [1, 1, 1],
   id = "urdf-robot",
   initialJointStates,
+  rosConfig,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [jointStates, setJointStates] = useState<Record<string, number>>(
+    initialJointStates || {}
+  );
 
   // Get robot URL
   const robotUrl = useMemo(() => {
@@ -222,15 +413,6 @@ const URDFRobot: React.FC<URDFRobotProps> = ({
     }
     return url;
   }, [type, id]);
-
-  // Update position when props change
-  useEffect(() => {
-    if (groupRef.current) {
-      groupRef.current.position.set(...position);
-      groupRef.current.rotation.set(...rotation);
-      groupRef.current.scale.set(...scale);
-    }
-  }, [position, rotation, scale]);
 
   if (!robotUrl) {
     return <ErrorFallback />;
@@ -250,8 +432,20 @@ const URDFRobot: React.FC<URDFRobotProps> = ({
         <RobotModel
           robotUrl={robotUrl}
           initialJointStates={initialJointStates}
+          jointStates={jointStates}
+          type={type}
           id={id}
         />
+        {rosConfig && (
+          <ROSConnection
+            config={rosConfig}
+            onJointStates={setJointStates}
+            onConnectionChange={setIsConnected}
+            id={id}
+          />
+        )}
+        {/* 
+        <ConnectionIndicator isConnected={isConnected} /> */}
       </Suspense>
     </group>
   );

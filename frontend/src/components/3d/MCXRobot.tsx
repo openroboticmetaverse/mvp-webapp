@@ -110,11 +110,11 @@ const RobotModel: React.FC<{
 }> = React.memo(({ gltf, jointConfig, jointStates, debug, id }) => {
   const modelRef = useRef<THREE.Group>(gltf.clone());
 
-  /*  useFrame(() => {
+  useFrame(() => {
     if (modelRef.current) {
       applyJointAngles(modelRef.current, jointConfig, jointStates);
     }
-  }); */
+  });
 
   /**
    * Apply joint angles to the model
@@ -323,7 +323,8 @@ const MCXRobot: React.FC<MCXRobotProps> = ({
               debug={debug}
               id={id}
             />
-            <ConnectionIndicator isConnected={isConnected} />
+            {/* 
+            <ConnectionIndicator isConnected={isConnected} /> */}
           </>
         ) : (
           <ErrorFallback />
