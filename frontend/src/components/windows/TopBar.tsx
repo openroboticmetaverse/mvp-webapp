@@ -74,50 +74,8 @@ const TopBar: React.FC = observer(() => {
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-10 backdrop-blur-sm shadow-md text-white rounded-full px-4 py-2 flex items-center space-x-4 z-10">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-sm font-semibold truncate max-w-[160px]">
-              {sceneStore.activeScene
-                ? sceneStore.activeScene.name
-                : "No Scene Selected"}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent></TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <span className="text-md">Meetup Demo #2</span>
 
-      <div className="w-px h-4 bg-gray-300" />
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-xs text-gray-400 truncate max-w-[150px]">
-              {sceneStore.activeScene
-                ? new Date(sceneStore.activeScene.updated_at).toLocaleString()
-                : "Not available"}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Last updated</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <div className="w-px h-4 bg-gray-300" />
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-xs text-gray-400">
-              Objects: {objectCount} | Robots: {robotCount}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Objects & Robots in the current scene</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <div className="w-px h-4 bg-gray-300" />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
