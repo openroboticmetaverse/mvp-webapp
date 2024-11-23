@@ -1,16 +1,30 @@
 import React from "react";
 import MainNav from "@/components/main-nav";
 import Window from "@/components/window";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "./windows/TopBar";
 import { Toaster } from "./ui/toaster";
 import { observer } from "mobx-react-lite";
+import { sceneStore } from "@/stores/scene-store";
+import { HelpDialog } from "./ui/help-dialog";
 
 const DefaultLayout: React.FC<{ children: React.ReactNode }> = observer(
   ({ children }) => {
     const [openedWindow, setOpenedWindow] = useState<string | null>(null);
 
+    // Show properties panel when an object is selected
+    useEffect(() => {
+      if (sceneStore.selectedItemId) {
+        setOpenedWindow("properties");
+      } else {
+        setOpenedWindow(null);
+      }
+    }, [sceneStore.selectedItemId]);
+
     const handleOpenedWindow = (windowName: string) => {
+      if (windowName === "properties" && !sceneStore.selectedItemId) {
+        return; // Don't open properties panel if no object is selected
+      }
       setOpenedWindow((prevWindow) =>
         prevWindow === windowName ? null : windowName
       );
@@ -32,6 +46,8 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = observer(
             />
           </a>
         </div>
+        {/* Help Dialog */}
+        <HelpDialog />
       </div>
     );
   }

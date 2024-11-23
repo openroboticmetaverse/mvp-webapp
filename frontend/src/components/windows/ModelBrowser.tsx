@@ -34,48 +34,61 @@ interface ModelInfo {
   reference?: string;
 }
 
-const ModelItem: React.FC<{ model: ModelInfo }> = React.memo(({ model }) => {
-  const handleModelClick = useCallback(() => {
-    if (model.type === "object" && model.reference) {
-      objectStore.createObjectFromReference(model.reference);
-    } else if (model.type === "robot" && model.reference) {
-      robotStore.createRobotFromReference(model.reference);
-    } else if (model.type === "primitive") {
-      // Handle primitive shape creation here
-      console.log("Creating primitive shape:", model.name);
-    }
-  }, [model]);
+const ModelItem: React.FC<{ model: ModelInfo }> = React.memo(
+  ({ model }) => {
+    const handleModelClick = useCallback(async () => {
+      try {
+        if (model.type === "object" && model.reference) {
+          await objectStore.createObjectFromReference(model.reference);
+        } else if (model.type === "robot" && model.reference) {
+          await robotStore.createRobotFromReference(model.reference);
+        } else if (model.type === "primitive") {
+          console.log("Creating primitive shape:", model.name);
+        }
+      } catch (error) {
+        console.error("Error creating model:", error);
+      }
+    }, [model.type, model.reference, model.name]);
 
-  return (
-    <HoverCard key={model.id} openDelay={200} closeDelay={200}>
-      <HoverCardTrigger asChild>
-        <div
-          onClick={handleModelClick}
-          className="rounded border border-gray-300 p-1 hover:bg-white hover:bg-opacity-25 cursor-pointer w-full h-full flex flex-col items-center justify-center transition-colors duration-200"
-        >
-          <div className="text-white">{model.icon}</div>
-          <div className="text-sm mt-1 truncate text-gray-100">
-            {model.name}
+    return (
+      <HoverCard key={model.id} openDelay={200} closeDelay={200}>
+        <HoverCardTrigger asChild>
+          <div
+            onClick={handleModelClick}
+            className="rounded border border-gray-300 p-1 hover:bg-white hover:bg-opacity-25 cursor-pointer w-full h-full flex flex-col items-center justify-center transition-colors duration-200"
+          >
+            <div className="text-white">{model.icon}</div>
+            <div className="text-sm mt-1 truncate text-gray-100">
+              {model.name}
+            </div>
           </div>
-        </div>
-      </HoverCardTrigger>
-      <HoverCardContent className="w-60">
-        <WindowCard
-          description={
-            <>
-              <span>{model.description}</span>
-              <br />
-              <span className="text-xs font-mono text-green-700">
-                Model ID: <code>{model.id}</code>
-              </span>
-            </>
-          }
-          title={model.name}
-        />
-      </HoverCardContent>
-    </HoverCard>
-  );
-});
+        </HoverCardTrigger>
+        <HoverCardContent className="w-60">
+          <WindowCard
+            description={
+              <>
+                <span>{model.description}</span>
+                <br />
+                <span className="text-xs font-mono text-green-700">
+                  Model ID: <code>{model.id}</code>
+                </span>
+              </>
+            }
+            title={model.name}
+          />
+        </HoverCardContent>
+      </HoverCard>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function to prevent unnecessary re-renders
+    return (
+      prevProps.model.id === nextProps.model.id &&
+      prevProps.model.name === nextProps.model.name &&
+      prevProps.model.type === nextProps.model.type
+    );
+  }
+);
 
 const ModelGrid: React.FC<{ models: ModelInfo[] }> = React.memo(
   ({ models }) => (

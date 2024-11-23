@@ -2,6 +2,7 @@ import { useState, useEffect, ReactElement } from "react";
 import ModelBrowser from "@/components/windows/ModelBrowser";
 import SceneSelector from "./windows/scene-selector";
 import SceneItemsList from "@/components/windows/SceneItemsList";
+import PropertiesPanel from "./windows/PropertiesPanel";
 
 interface WindowProps {
   position: "left" | "right";
@@ -24,6 +25,9 @@ const Window = ({ position = "left", windowTag }: WindowProps) => {
         break;
       case "scene-selector":
         setContent(<SceneSelector />);
+        break;
+      case "properties":
+        setContent(<PropertiesPanel />);
         break;
       default:
         setContent(null);

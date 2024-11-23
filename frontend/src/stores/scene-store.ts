@@ -271,6 +271,8 @@ class SceneStore extends BasePendingStore<IScene> {
    */
   @observable selectedItemId: string | null = null;
 
+  @observable _cachedSelectedItem: any;
+
   constructor() {
     super();
     makeObservable(this);
@@ -288,26 +290,38 @@ class SceneStore extends BasePendingStore<IScene> {
    * The objects in the currently active scene
    */
   @computed get currentSceneObjects() {
-    return this.objects
+    // Get objects from both the main list and pending creations
+    const allObjects = [
+      ...this.objects,
+      ...Array.from(objectStore.pendingCreations.values()),
+    ];
+
+    return allObjects
       .filter((obj) => obj.scene_id === this.activeSceneId)
       .map((obj) => ({
         ...obj,
-        ...this.pendingChanges.get(obj.id),
-        ...(this.pendingCreations.get(obj.id) || {}),
+        ...objectStore.pendingChanges.get(obj.id),
       }))
-      .filter((obj) => !this.pendingDeletions.has(obj.id));
+      .filter((obj) => !objectStore.pendingDeletions.has(obj.id));
   }
 
   /**
    * The robots in the currently active scene
    */
   @computed get currentSceneRobots() {
-    return this.robots
+    // Get robots from both the main list and pending creations
+    const allRobots = [
+      ...this.robots,
+      ...Array.from(robotStore.pendingCreations.values()),
+    ];
+
+    return allRobots
       .filter((robot) => robot.scene_id === this.activeSceneId)
       .map((robot) => ({
         ...robot,
-        ...this.pendingChanges.get(robot.id),
-      }));
+        ...robotStore.pendingChanges.get(robot.id),
+      }))
+      .filter((robot) => !robotStore.pendingDeletions.has(robot.id));
   }
 
   /**
@@ -315,13 +329,17 @@ class SceneStore extends BasePendingStore<IScene> {
    */
   @computed get selectedItem() {
     if (!this.selectedItemId) return null;
-    return (
-      this.currentSceneObjects.find((obj) => obj.id === this.selectedItemId) ||
-      this.currentSceneRobots.find(
-        (robot) => robot.id === this.selectedItemId
-      ) ||
-      null
-    );
+    
+    // Cache the found item to prevent repeated searches
+    if (!this._cachedSelectedItem || this._cachedSelectedItem.id !== this.selectedItemId) {
+      this._cachedSelectedItem = this.currentSceneObjects.find((obj) => obj.id === this.selectedItemId) ||
+                                this.currentSceneRobots.find(
+                                  (robot) => robot.id === this.selectedItemId
+                                ) ||
+                                null;
+    }
+    
+    return this._cachedSelectedItem;
   }
 
   /**
@@ -340,8 +358,14 @@ class SceneStore extends BasePendingStore<IScene> {
    */
   @action
   setSelectedItem(itemId: string | null) {
-    this.selectedItemId = itemId;
-    errorLoggingService.debug(`Selected item set to: ${itemId}`);
+    // Prevent unnecessary updates if the same item is selected
+    if (this.selectedItemId === itemId) {
+      return;
+    }
+    
+    runInAction(() => {
+      this.selectedItemId = itemId;
+    });
   }
 
   @action
@@ -512,9 +536,6 @@ class SceneStore extends BasePendingStore<IScene> {
 /**
  * Store for managing objects
  */
-/**
- * Store for managing objects
- */
 class ObjectStore extends BasePendingStore<IObject> {
   constructor() {
     super();
@@ -560,9 +581,30 @@ class ObjectStore extends BasePendingStore<IObject> {
   @action
   async updateObject(id: string, updates: Partial<IObject>) {
     errorLoggingService.info(`Updating object: ${id}`, updates);
-    this.applyLocalChange(id, updates);
-    if (!this.pendingChanges.has(id)) {
+    
+    try {
+      // Apply the update locally first for immediate feedback
+      this.applyLocalChange(id, updates);
+      
+      // Then save to the server
       await this.saveItem(id, updates);
+      
+      // After successful save, refresh the object data
+      const updatedObject = await sceneManagerApi.updateObject(id, updates);
+      
+      runInAction(() => {
+        const index = this.items.findIndex(item => item.id === id);
+        if (index !== -1) {
+          this.items[index] = updatedObject;
+        }
+      });
+      
+      errorLoggingService.info(`Object updated successfully: ${id}`);
+    } catch (error) {
+      errorLoggingService.error(`Error updating object: ${id}`, error as Error);
+      // Revert local changes on error
+      this.fetchObjects();
+      throw error;
     }
   }
 
@@ -665,15 +707,16 @@ class ObjectStore extends BasePendingStore<IObject> {
     try {
       const updatedObject = await sceneManagerApi.updateObject(id, updates);
       runInAction(() => {
-        const index = this.items.findIndex((item) => item.id === id);
+        const index = this.items.findIndex(item => item.id === id);
         if (index !== -1) {
           this.items[index] = updatedObject;
         }
+        // Clear pending changes after successful save
+        this.pendingChanges.delete(id);
       });
       errorLoggingService.info(`Object saved successfully: ${id}`);
     } catch (error) {
       errorLoggingService.error(`Error saving object: ${id}`, error as Error);
-      this.fetchObjects();
       throw error;
     }
   }
