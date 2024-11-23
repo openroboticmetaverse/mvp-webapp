@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import {
   Bot,
   Box,
@@ -21,6 +22,7 @@ import {
   Torus,
   Search,
   RefreshCw,
+  Ban,
 } from "lucide-react";
 
 interface ModelInfo {
@@ -90,6 +92,10 @@ const ModelBrowser: React.FC = observer(() => {
 
   useEffect(() => {
     libraryStore.fetchLibraryData();
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    await libraryStore.fetchLibraryData();
   }, []);
 
   const primitiveShapes: ModelInfo[] = useMemo(
@@ -176,7 +182,7 @@ const ModelBrowser: React.FC = observer(() => {
     [searchTerm]
   );
 
-  if (libraryStore.state.status === "loading") {
+  if (libraryStore.state && libraryStore.state.status === "loading") {
     return (
       <div className="flex justify-center items-center h-full">
         <RefreshCw className="animate-spin text-gray-100" />
@@ -184,7 +190,7 @@ const ModelBrowser: React.FC = observer(() => {
     );
   }
 
-  if (libraryStore.state.status === "error") {
+  if (libraryStore.state && libraryStore.state.status === "error") {
     return (
       <div className="text-red-500">Error: {libraryStore.state.error}</div>
     );
@@ -194,25 +200,47 @@ const ModelBrowser: React.FC = observer(() => {
     <div className="flex flex-col gap-8 p-4 text-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold">Model Browser</h2>
 
-      <div className="relative">
-        <Input
-          type="text"
-          placeholder="Search models..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 border-gray-700 text-gray-800"
-        />
-        <Search
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-800"
-          size={20}
-        />
+      <div className="flex items-center gap-2 mb-4">
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            placeholder="Search models..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 border-gray-700 text-gray-800"
+          />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-800"
+            size={20}
+          />
+        </div>
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={handleRefresh}
+          disabled={libraryStore.state && libraryStore.state.status === "loading"}
+          title="Refresh models"
+          className="rounded border hover:bg-white hover:bg-opacity-25 hover:text-gray-300"
+        >
+          <RefreshCw
+            className={`h-4 w-4 ${libraryStore.state && libraryStore.state.status === "loading" ? "animate-spin" : ""}`}
+          />
+        </Button>
       </div>
 
       <ScrollArea className="h-[calc(100vh-200px)]">
         <div className="space-y-8">
-          <section>
+          <section className="relative">
             <h3 className="text-xl font-semibold mb-4">Primitive Shapes</h3>
-            <ModelGrid models={filterModels(primitiveShapes)} />
+            <div className="relative">
+              <ModelGrid models={filterModels(primitiveShapes)} />
+              <div className="absolute inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center rounded-lg">
+                <div className="bg-white/80 px-4 py-3 rounded-lg shadow-lg flex flex-col items-center gap-2">
+                  <Ban size={24} className="text-red-800" />
+                  <span className="text-red-800 font-medium">Currently Disabled</span>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section>
