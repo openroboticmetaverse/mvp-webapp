@@ -31,7 +31,7 @@ const PropertiesPanel = observer(() => {
       updates[property] = value;
     }
 
-    // Apply all updates in a single transaction
+    // Use updateObject which handles both local state and pending changes
     runInAction(() => {
       objectStore.updateObject(selectedObject.id, updates);
     });

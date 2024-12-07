@@ -12,7 +12,8 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = observer(
   ({ children }) => {
     const [openedWindow, setOpenedWindow] = useState<string | null>(null);
 
-    // Show properties panel when an object is selected
+  // Temporarily disable properties panel due to performance issues
+   /*  // Show properties panel when an object is selected
     useEffect(() => {
       if (sceneStore.selectedItemId) {
         setOpenedWindow("properties");
@@ -20,7 +21,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = observer(
         setOpenedWindow(null);
       }
     }, [sceneStore.selectedItemId]);
-
+ */
     const handleOpenedWindow = (windowName: string) => {
       if (windowName === "properties" && !sceneStore.selectedItemId) {
         return; // Don't open properties panel if no object is selected
