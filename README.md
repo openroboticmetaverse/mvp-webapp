@@ -1,77 +1,74 @@
 <p align="center">
   <a href="https://www.openroboticmetaverse.org">
-    <img alt="orom" src="https://raw.githubusercontent.com/openroboverse/knowledge-base/main/docs/assets/icon.png" width="100" />
+    <img alt="orom logo" src="https://raw.githubusercontent.com/openroboverse/knowledge-base/main/docs/assets/icon.png" width="100" />
   </a>
 </p>
+
 <h1 align="center">
-  🤖 open robotic metaverse mvp - robotics platform 🌐
+  🤖 open robotic metaverse MVP - Robotics Platform 🌐
 </h1>
 
-> ### Migration WIP
->
-> Undergoing migration to React from Vue
+> ### Development Branch 🚧
+> This is the **development branch**, containing the latest version of the frontend for the platform.
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a5a71d78-589b-47d6-85e7-8293bb8a7fdd/deploy-status)](https://app.netlify.com/sites/orom-mvp/deploys)
 
+---
+
 ## Overview 🔍
 
-This project serves as the MVP (Minimum Viable Product) 🚀 for a larger vision aimed at developing a robotic metaverse, that brings robotic projects in one place. Utilizing a combination of modern web technologies, this platform allows users to interact with robots through a web browser, fostering a unique and interactive environment.
+The **open robotic metaverse MVP** is a browser-based platform designed to bring together robotic projects, empowering users to collaborate, share, and explore robotics projects.
 
-![image](https://github.com/user-attachments/assets/26531ac3-e93b-4ad2-9bd1-1c82543c13a0)
+![Platform Demo](image.png)
 
+---
 
 ## Key Features 🗝️
 
-- **Interactive Robotic Control**: Users can directly interact with robots in a virtual space. 🕹️
-- **Real-Time Observation**: Enables witnessing interactions between other users and robots. 👀
-- **Cross-User Engagement**: Supports multiple users interacting simultaneously within the metaverse. 👥
+- **Interactive Robotic Control**: Engage with robots in real-time within a virtual environment. 🕹️  
+- **Real-Time Observation**: Observe other users’ interactions with robots live. 👀  
+- **Collaborative Engagement**: Multi-user support allows seamless collaboration across the metaverse. 👥  
+
+---
 
 ## Technology Stack 🛠️
 
-- **Frontend**: Developed using Reac and Vite, offering a responsive and efficient user interface. 🌟
-- **Backend**: WIP💪
+- **React TS**  
+- **Tailwind CSS**  
+- **React Three Fiber**  
+
+---
 
 ## Setup ⚙️
 
-1. Clone the Repo 📥
+### 1. Clone the Repository 📥
 
 ```bash
 git clone https://github.com/openroboticmetaverse/mvp-webapp.git
-
-```
-
-```bash
 cd mvp-webapp
+git switch dev
 ```
 
-```bash
-git switch migrate-react
-```
+### 2. Start with Docker Compose 🐳
 
-2. Docker Compose 🐳
-
+Run the following command to start the development environment:  
 ```bash
 docker compose up -d
 ```
 
-## Start the frontend 🖼️
+### 3. Launch the Frontend 🖼️
 
-(In a new terminal)
-
-Open a console in the container 🖥️
-
+Open a terminal in the frontend container:  
 ```bash
-docker exec -it mvp_frontend_react /bin/bash
+docker exec -it mvp_frontend bash
 ```
 
-In the container console:
-
+Inside the container, install dependencies and start the development server:  
 ```bash
 yarn
-```
-
-```bash
 yarn dev --host
 ```
 
-Enjoy 🎉🥳
+Finally, open [http://localhost:5173](http://localhost:5173) in your browser to explore the MVP. 🎉
+
+
