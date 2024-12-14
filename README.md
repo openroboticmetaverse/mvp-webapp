@@ -13,7 +13,6 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a5a71d78-589b-47d6-85e7-8293bb8a7fdd/deploy-status)](https://app.netlify.com/sites/orom-mvp/deploys)
 
----
 
 ## Overview 🔍
 
@@ -21,7 +20,6 @@ The **open robotic metaverse MVP** is a browser-based platform designed to bring
 
 ![Platform Demo](image.png)
 
----
 
 ## Key Features 🗝️
 
@@ -29,7 +27,7 @@ The **open robotic metaverse MVP** is a browser-based platform designed to bring
 - **Real-Time Observation**: Observe other users’ interactions with robots live. 👀  
 - **Collaborative Engagement**: Multi-user support allows seamless collaboration across the metaverse. 👥  
 
----
+
 
 ## Technology Stack 🛠️
 
@@ -37,7 +35,6 @@ The **open robotic metaverse MVP** is a browser-based platform designed to bring
 - **Tailwind CSS**  
 - **React Three Fiber**  
 
----
 
 ## Setup ⚙️
 
